@@ -1,0 +1,18 @@
+spin_manifest_version = 2
+
+[application]
+name = "hello-world"
+version = "0.1.0"
+authors = ["Kate Goldenring <kate.goldenring@fermyon.com>"]
+description = ""
+
+[[trigger.http]]
+route = "/hello"
+component = "hello-world"
+
+[component.hello-world]
+source = "target/wasm32-wasi/release/hello_world.wasm"
+allowed_outbound_hosts = []
+[component.hello-world.build]
+command = "cargo build --target wasm32-wasi --release"
+watch = ["src/**/*.rs", "Cargo.toml"]
