@@ -16,13 +16,10 @@ for binary in "${binaries[@]}"; do
 done
 
 # If node IP is set, script is being run on another machine
-cluster_args=("--port $HOST_PORT:80@loadbalancer" "--agents 1")
+cluster_args=("--port $HOST_PORT:80@loadbalancer" "--image ghcr.io/spinkube/containerd-shim-spin/k3d:$SHIM_VERSION" "--agents 1")
 if [[ -n "$NODE_IP" ]]; then
   # Add remote host's IP as a SAN for the servers and agents certificates
   cluster_args=(
-    "--image ghcr.io/spinkube/containerd-shim-spin/k3d:$SHIM_VERSION"
-    "--port $HOST_PORT:80@loadbalancer"
-    "--agents 1"
     "--k3s-arg --write-kubeconfig-mode=0644@server:0"
     "--k3s-arg --tls-san=$NODE_IP@server:0"
     "--k3s-arg --tls-san=0.0.0.0@server:0"
