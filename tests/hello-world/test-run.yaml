@@ -1,0 +1,31 @@
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: hello-world-rust
+spec:
+  parallelism: 1
+  script:
+    configMap:
+      name: hello-world-rust
+      file: script.js
+  separate: false
+  runner:
+    env:
+      - name: SERVICE
+        value: hello-world-rust
+      - name: ROUTE
+        value: "hello"
+    metadata:
+      labels:
+        language: rust
+    securityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      runAsNonRoot: true
+    # resources:
+    #   limits:
+    #     cpu: 200m
+    #     memory: 1000Mi
+    #   requests:
+    #     cpu: 100m
+    #     memory: 500Mi
