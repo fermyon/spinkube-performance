@@ -1,0 +1,22 @@
+[
+    {
+        "name": "hello-world-rust",
+        "language": "rust",
+        "image": "ghcr.io/kate-goldenring/test-apps/hello-world-rust:2.3.1"
+    },
+    {
+        "name": "hello-world-go",
+        "language": "go",
+        "image": "ghcr.io/kate-goldenring/test-apps/hello-world-go:2.3.1"
+    },
+    {
+        "name": "hello-world-js",
+        "language": "js",
+        "image": "ghcr.io/kate-goldenring/test-apps/hello-world-js:2.3.1"
+    },
+    {
+        "name": "hello-world-py",
+        "language": "py",
+        "image": "ghcr.io/kate-goldenring/test-apps/hello-world-py:2.3.1"
+    }
+]
