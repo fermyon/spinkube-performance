@@ -32,6 +32,7 @@ fi
 k3d cluster create $CLUSTER_NAME ${cluster_args[@]}
 
 install_cert_manager
+install_k6_operator
 install_spin_operator
 
 # Generate kubeconfig at $HOME/.kube/config

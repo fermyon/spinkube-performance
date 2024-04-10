@@ -10,39 +10,41 @@ REGISTRY_URL=${1:-"ghcr.io/kate-goldenring/performance"}
 cd "$(dirname "$0")" || exit
 
 # Check for required binaries
-for binary in spin npm python3; do
+for binary in kubectl spin; do
   which_binary "$binary"
 done
 
-# List of build and pushed images
-pushed_apps=()
+# List of deployed apps
+deployed_apps=()
 
+# TODO: this is fragile as it assumes the same spin version
+# was used to build and push the apps
 spin_version=$(spin --version | awk '{print $2}')
+
+# Ensure the kube plugin is installed
+export SPIN_PLUGINS_SUPPRESS_COMPATIBILITY_WARNINGS=true
+spin plugins update
+spin plugins install kube
+
 # Loop through each directory in the current directory
 for dir in */; do
     # Remove the trailing slash from the directory name
     dir_name="${dir%/}"
-    pushd "$dir_name" || exit
-    # If JS or TS app, install dependencies
-    if [[ "$dir_name" == *js || "$dir_name" == *ts ]]; then
-        npm install
-    fi
-    # If python app, install requirements
-    if [[ "$dir_name" == *py ]]; then
-        python3 -m venv .venv
-        source .venv/bin/activate
-        python3 -m pip install -r requirements.txt
-    fi
     image_address="$REGISTRY_URL"/"$dir_name":"$spin_version"
-    spin build && spin registry push $image_address
+
+    # Deploy app via spin kube
+    spin kube scaffold --from $image_address | kubectl apply -f -
+
+    # Wait for deployment to be ready
+    kubectl wait --for=condition=available --timeout=60s deployment/$dir_name
+
     if [ $? -eq 0 ]; then
-        pushed_apps+=("$image_address")
+        deployed_apps+=("$image_address")
     fi
-    popd || exit
 done
 
 echo ""
-echo "Images pushed:"
-for entry in "${pushed_apps[@]}"; do
+echo "Apps deployed:"
+for entry in "${deployed_apps[@]}"; do
     echo "$entry"
 done

@@ -38,30 +38,39 @@ sed -i '' 's/0\.0\.0\.0/<NODE_IP>/g' $HOME/.kube/config
 
 ## Executing a Test with the k6 Operator
 
-1. [Install the operator](https://github.com/grafana/k6-operator/tree/main?tab=readme-ov-file#deployment-with-helm)
+1. Install _all the operators_ in the Kubernetes environment you're pointed at after [Setting Up Your Cluster](#setting-up-your-cluster)
 
-   ```sh
-   helm repo add grafana https://grafana.github.io/helm-charts
-    helm repo update
-    helm install k6-operator grafana/k6-operator
-    ```
-
-2. Create a ConfigMap with the script
+    Here we're pointed to a generic Kubernetes cluster and just need to run the [spin-kube-k8s.sh](./environment/spin-kube-k8s.sh) script:
 
     ```sh
-    kubectl create configmap hello-world-rust --from-file ./tests/hello-world/script.js
+    ./environment/spin-kube-k8s.sh
     ```
 
-3. Run the test by applying the `TestRun` resource
+1. (Optional) Build and push all of the test apps with your own `REGISTRY_URL`
 
     ```sh
-    kubectl apply -f tests/hello-world/test-run.yaml 
+    export REGISRY_URL=ghcr.io/kate-goldenring/performance
+    make build-and-push-apps
     ```
 
-4. Once the `hello-world-rust-1-*` Pod has `Completed` you can get the results of the test:
+1. Deploy the Spin Apps
 
     ```sh
-    kubectl logs hello-world-rust-1-*
+    make deploy-apps
+    ```
+
+1. Run the tests
+
+    ```sh
+    make run-tests
+    ```
+
+1. Once the test Pods have `Completed` you can get the results of the tests
+
+    Here we view the logs from the pod corresponding to the `hello-world-rust-1` job:
+
+    ```sh
+    kubectl logs -f job/hello-world-rust-1
     ```
     
     Output should look similar to:

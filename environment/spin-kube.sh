@@ -1,25 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
-SHIM_VERSION=${SHIM_VERSION:-v0.13.1}
+source $(dirname $(realpath "$0"))/../utils.sh
 
-# Function: which_binary
-# Description:
-# Finds and prints the path of the specified binary if it exists in the system's PATH.
-# If the binary is not found, it prints an error message.
-# Parameters:
-# $1 - The name of the binary to locate.
-which_binary() {
-  local binary_name="$1"
-  local binary_path
-  binary_path=$(command -v "$binary_name")
-  if [[ -n "$binary_path" ]]; then
-    echo "$binary_path"
-  else
-    echo "Could not find $binary_name" >&2
-    exit 1
-  fi
-}
+SHIM_VERSION=${SHIM_VERSION:-v0.13.1}
 
 install_cert_manager() {
   # Install cert-manager CRDs
@@ -53,6 +37,21 @@ install_kwasm_operator() {
 
   # Provision Nodes
   kubectl annotate node --all kwasm.sh/kwasm-node=true
+}
+
+install_k6_operator() {
+  # Add and update the Grafana chart repository
+  helm repo add grafana https://grafana.github.io/helm-charts
+  helm repo update
+
+  # Install the k6-operator Helm chart
+  helm upgrade --install \
+    k6-operator grafana/k6-operator \
+    --namespace k6 \
+    --create-namespace
+
+  # Wait for k6-operator deployment to be ready
+  kubectl wait --for=condition=available --timeout=20s deployment/k6-operator-controller-manager -n k6
 }
 
 install_spin_operator() {

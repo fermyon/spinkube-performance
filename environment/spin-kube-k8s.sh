@@ -8,5 +8,6 @@ for binary in kubectl helm; do
 done
 
 install_cert_manager
+install_k6_operator
 install_kwasm_operator
 install_spin_operator
