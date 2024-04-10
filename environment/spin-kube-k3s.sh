@@ -30,6 +30,7 @@ curl -sfL https://get.k3s.io | sh -s - server --write-kubeconfig-mode '0644' ${c
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 install_cert_manager
+install_k6_operator
 install_kwasm_operator
 
 # Re-export kubeconfig as kwasm operator may restart the k3s process 
