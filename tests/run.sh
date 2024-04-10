@@ -1,11 +1,19 @@
 #!/bin/bash
 
+source $(dirname $(realpath "$0"))/../utils.sh
+
+# TODO: change default to repo name
+REGISTRY_URL=${1:-"ghcr.io/kate-goldenring/performance"}
 TEST=${TEST:-"hello-world"}
-NODE_IP=${NODE_IP:-"localhost"}
 OUTPUT=${OUTPUT:-"datadog"}
 # Navigate to the directory containing the script
 path="$(dirname "$0")/$TEST"
 echo "path is $path"
+
+# Check for required binaries
+for binary in jq yq kubectl; do
+  which_binary "$binary"
+done
 
 test_config_json=$(cat $path/test-config.json)
 
@@ -17,31 +25,53 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
     }
 
     # Extract values
-    route=$(_jq '.route')
-    language=$(_jq '.language')
-    port=$(_jq '.port')
-    endpoint=http://$NODE_IP:$port/$route
+    # NOTE: export is needed for any value used by yq's 'env()' function
+    export name=$(_jq '.service')
+    export language=$(_jq '.language')
+    export route=$(_jq '.route')
+    export runner_image=$REGISTRY_URL/k6:latest
+
+    # Create the script ConfigMap
+    kubectl get configmap $name >/dev/null 2>&1 || \
+        kubectl create configmap $name --from-file $path/script.js
+
+    # Create temporary test run resource to customize per test app
+    tempfile="$(mktemp -d)/test-run-$name.yaml"
+    echo "Temporary TestRun resource: $tempfile"
+    cp $path/test-run.yaml $tempfile
+
+    # Update with common values regardless of output method
+    yq -i '(.spec.runner.image = env(runner_image)) |
+        (.metadata.name = env(name)) |
+        (.spec.script.configMap.name = env(name)) |
+        (.spec.runner.env += {"name": "SERVICE","value": env(name)}) |
+        (.spec.runner.env += {"name": "ROUTE","value": env(route)}) |
+        (.spec.runner.metadata.labels.language = env(language))' $tempfile
 
     # Run command with the appropriate output
     if [ "$OUTPUT" == "prometheus" ];
     then
         echo "Running with Prometheus output"
-        # Run the command - Output to Prometheus
-        K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9090/api/v1/write \
-        K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=true \
-        K6_PROMETHEUS_RW_TREND_STATS='p(99),p(50),min,max,avg' \
-        ./k6 run k6 run --out experimental-prometheus-rw --config $path/options.json --tag language=$language -e ENDPOINT=$endpoint $path/script.js
+
+        # TODO: update K6_PROMETHEUS_RW_SERVER_URL with correct url (k8s svc?)
+        yq -i '(.spec.runner.env += {"name": "K6_PROMETHEUS_RW_SERVER_URL","value": "http://localhost:9090/api/v1/write"}) |
+            (.spec.runner.env += {"name": "K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM","value": "true"}) |
+            (.spec.runner.env += {"name": "K6_PROMETHEUS_RW_TREND_STATS","value": "p(99),p(50),min,max,avg"})' $tempfile
     elif [ "$OUTPUT" == "datadog" ];
     then
         echo "Running with Datadog output"
-        statsd_addr=$NODE_IP:8125
-        K6_STATSD_ADDR=$statsd_addr \
-        K6_STATSD_ENABLE_TAGS=true \
-        ./k6 run --out output-statsd --config $path/options.json --tag language=$language -e ENDPOINT=$endpoint $path/script.js
+        # TODO: use datadog k8s svc from installed Helm release
+        export statsd_addr=statsd:8125
+
+        yq -i '(.spec.runner.env += {"name": "K6_OUT","value": "output-statsd"}) |
+            (.spec.runner.env += {"name": "K6_STATSD_ADDR","value": env(statsd_addr)}) |
+            (.spec.runner.env += {"name": "K6_STATSD_ENABLE_TAGS","value": "true"})' $tempfile
     else
         echo "Running with no output"
-        ./k6 run --config $path/options.json --tag language=$language $path/script.js -e ENDPOINT=$endpoint $NO_TEARDOWN
+        # TODO: write results summary to a file on the node?
     fi
+
+    kubectl apply -f $tempfile
 
     # Sleep between iterations
     sleep 3

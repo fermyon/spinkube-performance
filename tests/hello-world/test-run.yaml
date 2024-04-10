@@ -1,23 +1,22 @@
+# NOTE: this TestRun resource is intended to be dynamically updated prior to
+# running, eg via tests/run.sh
 apiVersion: k6.io/v1alpha1
 kind: TestRun
 metadata:
-  name: hello-world-rust
+  name: $name
 spec:
   parallelism: 1
   script:
     configMap:
-      name: hello-world-rust
+      name: $name
       file: script.js
   separate: false
   runner:
-    env:
-      - name: SERVICE
-        value: hello-world-rust
-      - name: ROUTE
-        value: "hello"
+    image: $runner_image
+    env: []
     metadata:
       labels:
-        language: rust
+        language: $language
     securityContext:
       runAsUser: 1000
       runAsGroup: 1000
