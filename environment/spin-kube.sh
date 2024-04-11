@@ -45,10 +45,13 @@ install_k6_operator() {
   helm repo update
 
   # Install the k6-operator Helm chart
+  # Note: the chart also attempts to create the namespace by default
+  # so we set namespace.create=false to ensure only Helm attempts creation
   helm upgrade --install \
     k6-operator grafana/k6-operator \
     --namespace k6 \
-    --create-namespace
+    --create-namespace \
+    --set namespace.create=false
 
   # Wait for k6-operator deployment to be ready
   kubectl wait --for=condition=available --timeout=20s deployment/k6-operator-controller-manager -n k6
