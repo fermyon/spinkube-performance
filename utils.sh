@@ -36,8 +36,5 @@ delete_k8s_resources() {
   # Loop through resources and delete
   for resource in $(kubectl -n $namespace get $resource_type -o name); do
       kubectl -n $namespace delete $resource
-      if [ $? -eq 0 ]; then
-          deleted+=("$resource")
-      fi
   done
 }
