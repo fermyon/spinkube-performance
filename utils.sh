@@ -18,3 +18,26 @@ which_binary() {
     exit 1
   fi
 }
+
+# Function: delete_k8s_resources
+#
+# Description:
+# Deletes all resources of the provided type in the provided namespace
+#
+# Parameters:
+# $1 - The name of the resource type.
+# $2 - (Optional) The Kubernetes namespace
+delete_k8s_resources() {
+  resource_type="${1}"
+  namespace="${2:-default}"
+
+  which_binary kubectl
+
+  # Loop through resources and delete
+  for resource in $(kubectl -n $namespace get $resource_type -o name); do
+      kubectl -n $namespace delete $resource
+      if [ $? -eq 0 ]; then
+          deleted+=("$resource")
+      fi
+  done
+}

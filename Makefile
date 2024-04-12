@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 REGISTRY_URL ?= ghcr.io/kate-goldenring/performance
 
 k6-build:
@@ -19,3 +21,11 @@ deploy-apps:
 
 run-tests:
 	./tests/run.sh $(REGISTRY_URL)
+
+cleanup: cleanup-apps cleanup-tests
+
+cleanup-apps:
+	source utils.sh && delete_k8s_resources spinapps
+
+cleanup-tests:
+	source utils.sh && delete_k8s_resources testruns
