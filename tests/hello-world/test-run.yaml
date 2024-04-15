@@ -10,6 +10,7 @@ spec:
     configMap:
       name: $name
       file: script.js
+  arguments: ""
   separate: false
   runner:
     image: $runner_image
