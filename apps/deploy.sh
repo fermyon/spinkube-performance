@@ -23,8 +23,7 @@ spin_version=$(spin --version | awk '{print $2}')
 
 # Ensure the kube plugin is installed
 export SPIN_PLUGINS_SUPPRESS_COMPATIBILITY_WARNINGS=true
-spin plugins update
-spin plugins install kube
+spin plugins update && spin plugins install --yes kube
 
 # Loop through each directory in the current directory
 for dir in */; do
