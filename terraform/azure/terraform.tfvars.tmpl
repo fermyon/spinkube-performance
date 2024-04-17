@@ -1,0 +1,31 @@
+prefix = "spinkubeperf"
+
+location = "westus2"
+
+system_nodepool = {
+  name = "agentpool"
+  size = "Standard_DS2_v2"
+  min  = 2
+  max  = 3
+}
+
+user_nodepools = [{
+  name       = "shim"
+  size       = "Standard_DS2_v2"
+  node_count = 2
+  max_pods   = 250
+  labels = {
+    "runtime" = "containerd-shim-spin"
+  }
+  taints = []
+}]
+
+tags = {
+  "Purpose" = "Testing SpinKube Performance"
+}
+
+# TODO: see monitoring.tf
+#
+# to set the current user as an admin you can get your user id from the az cli
+# example: az ad signed-in-user show -o tsv --query id
+# grafana_admins = [  ]
