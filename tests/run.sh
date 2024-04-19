@@ -43,10 +43,12 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
     # Update with common values regardless of output method
     yq -i '(.spec.runner.image = env(runner_image)) |
         (.metadata.name = env(name)) |
-        (.spec.script.configMap.name = env(name)) |
+        (.spec.arguments += "--tag language=") |
+        (.spec.arguments += env(language)) |
         (.spec.runner.env += {"name": "SERVICE","value": env(name)}) |
         (.spec.runner.env += {"name": "ROUTE","value": env(route)}) |
-        (.spec.runner.metadata.labels.language = env(language))' $tempfile
+        (.spec.runner.metadata.labels.language = env(language)) |
+        (.spec.script.configMap.name = env(name))' $tempfile
 
     # Run command with the appropriate output
     if [ "$OUTPUT" == "prometheus" ];
@@ -61,7 +63,7 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
     then
         echo "Running with Datadog output"
         # TODO: use datadog k8s svc from installed Helm release
-        export statsd_addr=statsd:8125
+        export statsd_addr=datadog.datadog.svc.cluster.local:8125
 
         yq -i '(.spec.runner.env += {"name": "K6_OUT","value": "output-statsd"}) |
             (.spec.runner.env += {"name": "K6_STATSD_ADDR","value": env(statsd_addr)}) |
