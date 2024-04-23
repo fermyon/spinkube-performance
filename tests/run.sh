@@ -3,6 +3,31 @@ set -eou pipefail
 
 source $(dirname $(realpath "$0"))/../utils.sh
 
+wait_for_testrun() {
+    local name=$1
+    local max_duration=${2:-90}
+    local status
+    local timeout=$((SECONDS+max_duration))
+
+    # Possible statuses are: "initialization", "initialized", "created", "started", "stopped", "finished", "error"
+    # see CRD: https://github.com/grafana/k6-operator/blob/main/config/crd/bases/k6.io_testruns.yaml#L5345
+    status=$(kubectl get testrun $name -o jsonpath='{.status.stage}')
+    while [[ $status != "finished" && $status != "error" && $status != "stopped" ]]; do
+        if [[ $SECONDS -gt $timeout ]]; then
+            echo "TestRun $name did not finish in $max_duration seconds"
+            exit 1
+        fi
+        echo "TestRun $name is $status"
+        sleep 3
+        status=$(kubectl get testrun $name -o jsonpath='{.status.stage}')
+    done
+    if [[ $status == "error" || $status == "stopped" ]]; then
+        echo "TestRun $name failed with status $status"
+        exit 1
+    fi
+    echo "TestRun $name succeeded"
+}
+
 # TODO: change default to repo name
 REGISTRY_URL=${1:-"ghcr.io/kate-goldenring/performance"}
 TEST=${TEST:-"hello-world"}
@@ -16,6 +41,8 @@ for binary in jq yq kubectl; do
   which_binary "$binary"
 done
 
+# Apply RBAC for K6 tests
+kubectl apply -f $path/../rbac.yaml
 test_config_json=$(cat $path/test-config.json)
 
 # Loop through each entry in the JSON array
@@ -30,6 +57,8 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
     export name=$(_jq '.service')
     export language=$(_jq '.language')
     export route=$(_jq '.route')
+    export image=$(_jq '.image')
+    export executor=${EXECUTOR:-"containerd-shim-spin"}
     export runner_image=$REGISTRY_URL/k6:latest
 
     # Create the script ConfigMap
@@ -48,6 +77,8 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
         (.spec.arguments += env(language)) |
         (.spec.runner.env += {"name": "SERVICE","value": env(name)}) |
         (.spec.runner.env += {"name": "ROUTE","value": env(route)}) |
+        (.spec.runner.env += {"name": "EXECUTOR","value": env(executor)}) |
+        (.spec.runner.env += {"name": "IMAGE","value": env(image)}) |
         (.spec.runner.metadata.labels.language = env(language)) |
         (.spec.script.configMap.name = env(name))' $tempfile
 
@@ -76,6 +107,5 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
 
     kubectl apply -f $tempfile
 
-    # Sleep between iterations
-    sleep 3
+    wait_for_testrun $name
 done

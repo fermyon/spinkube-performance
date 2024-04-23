@@ -14,6 +14,7 @@ spec:
   separate: false
   runner:
     image: $runner_image
+    serviceAccountName: k6-service-account
     env: []
     metadata:
       labels:

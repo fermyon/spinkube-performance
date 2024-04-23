@@ -53,12 +53,6 @@ sed -i '' 's/0\.0\.0\.0/<NODE_IP>/g' $HOME/.kube/config
     make build-and-push-apps
     ```
 
-1. Deploy the Spin Apps
-
-    ```sh
-    make deploy-apps
-    ```
-
 1. Run the tests
 
     ```sh

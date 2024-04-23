@@ -16,9 +16,6 @@ push-k6-image:
 build-and-push-apps:
 	./apps/build-and-push.sh $(REGISTRY_URL)
 
-deploy-apps:
-	./apps/deploy.sh $(REGISTRY_URL)
-
 run-tests:
 	./tests/run.sh $(REGISTRY_URL)
 
