@@ -10,7 +10,7 @@ REGISTRY_URL=${1:-"ghcr.io/kate-goldenring/performance"}
 cd "$(dirname "$0")" || exit
 
 # Check for required binaries
-for binary in spin npm python3; do
+for binary in spin tinygo npm python3; do
   which_binary "$binary"
 done
 
@@ -25,6 +25,7 @@ for dir in */; do
     pushd "$dir_name" || exit
     # If JS or TS app, install dependencies
     if [[ "$dir_name" == *js || "$dir_name" == *ts ]]; then
+        spin plugins update && spin plugin install --yes js2wasm
         npm install
     fi
     # If python app, install requirements

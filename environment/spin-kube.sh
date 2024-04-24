@@ -5,6 +5,7 @@ source $(dirname $(realpath "$0"))/../utils.sh
 
 SHIM_VERSION=${SHIM_VERSION:-v0.13.1}
 DATADOG_API_KEY=${DATADOG_API_KEY:-''}
+READINESS_TIMEOUT=${READINESS_TIMEOUT:-20s}
 
 install_cert_manager() {
   # Install cert-manager CRDs
@@ -22,7 +23,7 @@ install_cert_manager() {
     --version v1.14.3
 
   # Wait for cert-manager to be ready
-  kubectl wait --for=condition=available --timeout=20s deployment/cert-manager-webhook -n cert-manager
+  kubectl wait --for=condition=available --timeout=${READINESS_TIMEOUT} deployment/cert-manager-webhook -n cert-manager
 }
 
 install_datadog() {
@@ -81,7 +82,7 @@ install_k6_operator() {
     --set namespace.create=false
 
   # Wait for k6-operator deployment to be ready
-  kubectl wait --for=condition=available --timeout=20s deployment/k6-operator-controller-manager -n k6
+  kubectl wait --for=condition=available --timeout=${READINESS_TIMEOUT} deployment/k6-operator-controller-manager -n k6
 }
 
 install_spin_operator() {
@@ -103,5 +104,5 @@ install_spin_operator() {
   kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0/spin-operator.shim-executor.yaml
 
   # Wait for the Spin Operator to be ready
-  kubectl wait --for=condition=available --timeout=20s deployment/spin-operator-controller-manager -n spin-operator
+  kubectl wait --for=condition=available --timeout=${READINESS_TIMEOUT} deployment/spin-operator-controller-manager -n spin-operator
 }

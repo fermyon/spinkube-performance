@@ -1,0 +1,155 @@
+# TODO: modularize; eg split out provisioning, setup, build/push, test runs into separate jobs and perhaps even workflows
+# eg:
+# Stage 1 (all concurrent):
+#   k6-image
+#   apps
+#   provision and setup cluster
+# Stage 2 (depends on completion of all of above):
+#   run tests
+# Stage 3
+#   deprovision cluster
+#
+# TODO: use TF cloud
+
+name: SpinKube Performance Tests
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY_URL: ttl.sh/spinkube-perf-${{ github.run_id }}-${{ github.run_attempt }}
+
+jobs:
+  k6-image:
+    name: Build and push k6 image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: setup buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: image/k6
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.REGISTRY_URL }}/k6:latest
+
+  apps:
+    name: Build and push Spin apps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Spin
+        uses: fermyon/actions/spin/setup@v1
+
+      - name: Install TinyGo
+        uses: acifani/setup-tinygo@v2
+        with:
+          tinygo-version: '0.31.2'
+
+      - name: Install Rust wasm target
+        run: rustup target add wasm32-wasi
+
+      - name: Build and push apps
+        run: make build-and-push-apps
+
+  tests:
+    name: Run SpinKube Performance Tests (AKS)
+    runs-on: ubuntu-latest
+    outputs:
+      kubeconfig: ${{ steps.provision.outputs.kubeconfig }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Terraform init
+        working-directory: terraform/azure
+        run: terraform init
+
+      - name: Terraform vars
+        working-directory: terraform/azure
+        # TODO: use secret for this var file?
+        # Or update defaults to prioritize the preferred CI scenario so only a few vars need to be set, if any?
+        run: |
+          cat > terraform.tfvars << EOF
+          prefix = "ci-spinkube-perf"
+
+          location = "westus2"
+
+          system_nodepool = {
+            name = "agentpool"
+            size = "Standard_A2_v2"
+            min  = 2
+            max  = 3
+          }
+
+          user_nodepools = [{
+            name       = "shim"
+            size       = "Standard_A2_v2"
+            node_count = 2
+            max_pods   = 250
+            labels = {
+              "runtime" = "containerd-shim-spin"
+            }
+            taints = []
+          }]
+
+          tags = {
+            "Purpose" = "Testing SpinKube Performance"
+          }
+          EOF
+
+      - name: Terraform plan
+        working-directory: terraform/azure
+        run: terraform plan -input=false -out=tf.plan
+
+      - name: Terraform apply
+        working-directory: terraform/azure
+        run: terraform apply -input=false -auto-approve tf.plan
+
+      - name: Export kubeconfig
+        working-directory: terraform/azure
+        run: |
+          mkdir -p $HOME/.kube
+          terraform output -raw kube_config > $HOME/.kube/config
+          sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+      - name: Setup cluster
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+          READINESS_TIMEOUT: "120s"
+        run: ./environment/spin-kube-k8s.sh
+
+      # NOTE: will probably remove this Spin install and deploy-apps step once k6 tests deploy apps themselves
+      # TODO: fragile; depends on apps being built and pushed but we don't want this job
+      # to depend on the other (we'd like them to run in parallel)
+      # See longer-term TODO at top of file re: splitting things up more properly
+      - name: Install Spin
+        uses: fermyon/actions/spin/setup@v1
+
+      - name: Deploy apps
+        run: make deploy-apps
+
+      - name: Run tests
+        run: make run-tests
+
+      # HACK(vdice): Here we sleep to wait for the tests to run
+      # TODO: run.sh or some other logic should both ensure the k6 testruns/pods enter a running state
+      # and then wait for them to run to completion, before proceeding to deprovision the cluster
+      - name: Sleep
+        run: sleep 300
+
+      - name: Deprovision K8s cluster (AKS)
+        if: ${{ always() }}
+        working-directory: terraform/azure
+        run: terraform destroy -input=false -auto-approve

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eou pipefail
 
 source $(dirname $(realpath "$0"))/../utils.sh
 
