@@ -4,6 +4,7 @@ on:
     branches: [ main ]
     paths:
       - image/k6/Dockerfile
+  workflow_dispatch:
 
 env:
   REGISTRY_URL: ghcr.io/${{github.repository}}
