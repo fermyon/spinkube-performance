@@ -32,6 +32,7 @@ wait_for_testrun() {
 REGISTRY_URL=${1:-"ghcr.io/kate-goldenring/performance"}
 TEST=${TEST:-"hello-world"}
 OUTPUT=${OUTPUT:-"datadog"}
+SPIN_VERSION=${SPIN_VERSION:-"2.4.2"}
 # Navigate to the directory containing the script
 path="$(dirname "$0")/$TEST"
 echo "path is $path"
@@ -57,7 +58,7 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
     export name=$(_jq '.service')
     export language=$(_jq '.language')
     export route=$(_jq '.route')
-    export image=$(_jq '.image')
+    export image=$REGISTRY_URL/$name:$SPIN_VERSION
     export executor=${EXECUTOR:-"containerd-shim-spin"}
     export runner_image=$REGISTRY_URL/k6:latest
 

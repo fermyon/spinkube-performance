@@ -2,28 +2,24 @@
     {
         "service": "hello-world-rust",
         "language": "rust",
-        "image": "ghcr.io/kate-goldenring/test-apps/hello-world-rust:2.3.1",
         "route": "hello",
         "port": 80
     },
     {
         "service": "hello-world-go",
         "language": "go",
-        "image": "ghcr.io/kate-goldenring/test-apps/hello-world-go:2.3.1",
         "route": "hello",
         "port": 81
     },
     {
         "service": "hello-world-js",
         "language": "js",
-        "image": "ghcr.io/kate-goldenring/test-apps/hello-world-js:2.3.1",
         "route": "hello",
         "port": 82
     },
     {
         "service": "hello-world-py",
         "language": "py",
-        "image": "ghcr.io/kate-goldenring/test-apps/hello-world-py:2.3.1",
         "route": "hello", 
         "port": 83
     }

@@ -1,0 +1,35 @@
+name: Build and Push Spin Apps
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - apps/**
+  workflow_dispatch:
+
+env:
+    REGISTRY_URL: ghcr.io/${{github.repository}}
+    SPIN_VERSION: v2.4.2
+    
+jobs:
+  apps:
+    name: Build and push Spin apps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Spin
+        uses: fermyon/actions/spin/setup@v1
+        with:
+          version: ${{ env.SPIN_VERSION }}
+
+      - name: Install TinyGo
+        uses: acifani/setup-tinygo@v2
+        with:
+          tinygo-version: '0.31.2'
+
+      - name: Install Rust wasm target
+        run: rustup target add wasm32-wasi
+
+      - name: Build and push apps
+        run: make build-and-push-apps
