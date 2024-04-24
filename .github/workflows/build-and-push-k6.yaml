@@ -1,0 +1,30 @@
+name: Build and Push K6 Image
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - image/k6/Dockerfile
+
+env:
+  REGISTRY_URL: ghcr.io/${{github.repository}}
+
+jobs:
+  k6-image:
+    name: Build and push k6 image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: setup buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: image/k6
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.REGISTRY_URL }}/k6:latest
