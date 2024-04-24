@@ -9,7 +9,7 @@ on:
 
 env:
     REGISTRY_URL: ghcr.io/${{github.repository}}
-    SPIN_VERSION: v2.4.2
+    SPIN_V_VERSION: v2.4.2
     
 jobs:
   apps:
@@ -21,7 +21,7 @@ jobs:
       - name: Install Spin
         uses: fermyon/actions/spin/setup@v1
         with:
-          version: ${{ env.SPIN_VERSION }}
+          version: ${{ env.SPIN_V_VERSION }}
 
       - name: Install TinyGo
         uses: acifani/setup-tinygo@v2

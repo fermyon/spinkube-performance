@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY_URL: ghcr.io/${{github.repository}}
-  SPIN_VERSION: v2.4.2
+  SPIN_V_VERSION: v2.4.2
 
 jobs:
   tests:
