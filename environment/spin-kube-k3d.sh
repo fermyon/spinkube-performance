@@ -31,6 +31,9 @@ fi
 
 k3d cluster create $CLUSTER_NAME ${cluster_args[@]}
 
+# Apply node labels used by install_* helpers from spin-kube.sh
+kubectl annotate node --all workload=system
+
 install_cert_manager
 install_datadog
 install_k6_operator

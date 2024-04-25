@@ -29,6 +29,10 @@ curl -sfL https://get.k3s.io | sh -s - server --write-kubeconfig-mode '0644' ${c
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
+# Apply node labels used by install_* helpers from spin-kube.sh
+kubectl annotate node --all workload=system
+kubectl annotate node --all runtime=containerd-shim-spin
+
 install_cert_manager
 install_datadog
 install_k6_operator

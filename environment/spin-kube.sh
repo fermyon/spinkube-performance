@@ -20,6 +20,10 @@ install_cert_manager() {
     cert-manager jetstack/cert-manager \
     --namespace cert-manager \
     --create-namespace \
+    --set nodeSelector.workload=system \
+    --set cainjector.nodeSelector.workload=system \
+    --set startupapicheck.nodeSelector.workload=system \
+    --set webhook.nodeSelector.workload=system \
     --version v1.14.3
 
   # Wait for cert-manager to be ready
@@ -46,6 +50,8 @@ install_datadog() {
     helm upgrade --install datadog \
       --namespace datadog \
       --create-namespace \
+      --set agents.nodeSelector.workload=system \
+      --set clusterAgent.nodeSelector.workload=system \
       --set datadog.kubelet.host.valueFrom.fieldRef.fieldPath=spec.nodeName \
       --set datadog.kubelet.hostCAPath=/etc/kubernetes/certs/kubeletserver.crt \
       --set datadog.apiKey="${DATADOG_API_KEY}" datadog/datadog
@@ -61,10 +67,12 @@ install_kwasm_operator() {
     kwasm-operator kwasm/kwasm-operator \
     --namespace kwasm \
     --create-namespace \
+    --set nodeSelector.workload=system \
     --set "kwasmOperator.installerImage=ghcr.io/spinkube/containerd-shim-spin/node-installer:$SHIM_VERSION"
 
-  # Provision Nodes
-  kubectl annotate node --all kwasm.sh/kwasm-node=true
+  # Provision Nodes labeled with 'runtime=containerd-shim-spin'
+  # Other nodes may have different labels/purposes and we may not want apps to run there
+  kubectl annotate node -l runtime=containerd-shim-spin kwasm.sh/kwasm-node=true
 }
 
 install_k6_operator() {
@@ -79,6 +87,7 @@ install_k6_operator() {
     k6-operator grafana/k6-operator \
     --namespace k6 \
     --create-namespace \
+    --set nodeSelector.workload=system \
     --set namespace.create=false
 
   # Wait for k6-operator deployment to be ready
