@@ -61,6 +61,7 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
     export image=$REGISTRY_URL/$name:$SPIN_V_VERSION
     export executor=${EXECUTOR:-"containerd-shim-spin"}
     export runner_image=$REGISTRY_URL/k6:latest
+    export timestamp=$(date "+%Y-%m-%d-%H:%M:%S")
 
     # Create the script ConfigMap
     kubectl get configmap $name >/dev/null 2>&1 || \
@@ -76,6 +77,8 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
         (.metadata.name = env(name)) |
         (.spec.arguments += "--tag language=") |
         (.spec.arguments += env(language)) |
+        (.spec.arguments += " --tag timestamp=") |
+        (.spec.arguments += env(timestamp)) |
         (.spec.runner.env += {"name": "SERVICE","value": env(name)}) |
         (.spec.runner.env += {"name": "ROUTE","value": env(route)}) |
         (.spec.runner.env += {"name": "EXECUTOR","value": env(executor)}) |
