@@ -32,7 +32,7 @@ wait_for_testrun() {
 REGISTRY_URL=${1:-"ghcr.io/kate-goldenring/performance"}
 TEST=${TEST:-"hello-world"}
 OUTPUT=${OUTPUT:-"datadog"}
-SPIN_V_VERSION=${SPIN_V_VERSION:-"v2.4.2"}
+SPIN_V_VERSION=${SPIN_V_VERSION:-"2.4.2"}
 # Navigate to the directory containing the script
 path="$(dirname "$0")/$TEST"
 echo "path is $path"

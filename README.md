@@ -46,11 +46,12 @@ sed -i '' 's/0\.0\.0\.0/<NODE_IP>/g' $HOME/.kube/config
     ./environment/spin-kube-k8s.sh
     ```
 
-1. (Optional) Build and push all of the test apps with your own `REGISTRY_URL`
+1. (Optional) If using your own `REGISTRY_URL`, you'll want to build and push the apps as well as the k6 operator image:
 
     ```sh
     export REGISRY_URL=ghcr.io/kate-goldenring/performance
     make build-and-push-apps
+    make build-k6-image push-k6-image
     ```
 
 1. Run the tests
