@@ -26,9 +26,9 @@ variable "system_nodepool" {
   })
   default = {
     name = "agentpool"
-    size = "Standard_DS2_v2"
-    min  = 2
-    max  = 3
+    size = "Standard_A2_v2"
+    min  = 1
+    max  = 1
   }
 }
 
@@ -42,14 +42,24 @@ variable "user_nodepools" {
     taints     = list(string)
   }))
   default = [{
-    name       = "shim"
-    size       = "Standard_DS2_v2"
+    name       = "apps"
+    size       = "Standard_A2_v2"
     node_count = 1
     max_pods   = 250
     labels = {
       "runtime" = "containerd-shim-spin"
     }
     taints = []
+    },
+    {
+      name       = "system"
+      size       = "Standard_A2_v2"
+      node_count = 1
+      max_pods   = 100
+      labels = {
+        "workload" = "system"
+      }
+      taints = []
   }]
 }
 
