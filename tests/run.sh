@@ -36,6 +36,7 @@ REGISTRY_URL=${1:-"ghcr.io/kate-goldenring/performance"}
 TEST=${TEST:-"hello-world"}
 OUTPUT=${OUTPUT:-"datadog"}
 SPIN_V_VERSION=${SPIN_V_VERSION:-"2.4.2"}
+TEST_ID=${TEST_ID:-$(date "+%Y-%m-%d-%H:%M:%S")}
 # Navigate to the directory containing the script
 path="$(dirname "$0")"
 echo "path is $path"
@@ -70,7 +71,7 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
     export image=$REGISTRY_URL/$name:$SPIN_V_VERSION
     export executor=${EXECUTOR:-"containerd-shim-spin"}
     export runner_image=$REGISTRY_URL/k6:latest
-    export timestamp=$(date "+%Y-%m-%d-%H:%M:%S")
+    export test_id=$TEST_ID
     echo "Running test $name"
     # Create a tar archive of the test script and helper functions
     ./k6 archive $path/$TEST.js
@@ -88,8 +89,8 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
         (.metadata.name = env(name)) |
         (.spec.arguments += "--tag language=") |
         (.spec.arguments += env(language)) |
-        (.spec.arguments += " --tag timestamp=") |
-        (.spec.arguments += env(timestamp)) |
+        (.spec.arguments += " --tag testid=") |
+        (.spec.arguments += env(test_id)) |
         (.spec.runner.env += {"name": "SERVICE","value": env(name)}) |
         (.spec.runner.env += {"name": "EXECUTOR","value": env(executor)}) |
         (.spec.runner.env += {"name": "IMAGE","value": env(image)}) |
