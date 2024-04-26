@@ -17,7 +17,8 @@ build-and-push-apps:
 	./apps/build-and-push.sh $(REGISTRY_URL)
 
 run-tests:
-	./tests/run.sh $(REGISTRY_URL)
+	TEST=hello-world ./tests/run.sh $(REGISTRY_URL)
+	TEST=density ./tests/run.sh $(REGISTRY_URL)
 
 cleanup: cleanup-apps cleanup-tests
 

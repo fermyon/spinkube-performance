@@ -2,25 +2,21 @@
     {
         "service": "hello-world-rust",
         "language": "rust",
-        "route": "hello",
-        "port": 80
+        "route": "hello"
     },
     {
         "service": "hello-world-go",
         "language": "go",
-        "route": "hello",
-        "port": 81
+        "route": "hello"
     },
     {
         "service": "hello-world-js",
         "language": "js",
-        "route": "hello",
-        "port": 82
+        "route": "hello"
     },
     {
         "service": "hello-world-py",
         "language": "py",
-        "route": "hello", 
-        "port": 83
+        "route": "hello"
     }
 ]

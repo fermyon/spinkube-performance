@@ -95,22 +95,17 @@ sed -i '' 's/0\.0\.0\.0/<NODE_IP>/g' $HOME/.kube/config
      vus_max........................: 200     min=200      max=200
      ```
 
-## Executing a Test with Automatic Application Configuration
+### Creating a Test Case File
 
-Use the [`run.sh`](./tests/with-k8s-extension/run.sh) script to execute a test that also configures the applications. For now, the script assumes a single node cluster. Specify the node IP address in `NODE_IP`.
+A set of [test cases](./tests/cases/) for a script can be described in a JSON file that contains an array of objects. This file is ingested by the [`run.sh`](./tests/run.sh) script which transforms the fields into environment variables for the K6 script (or tags in the case of `language`). The following is a list of the fields the `run.sh` script can handle:
 
-```sh
- ./tests/run.sh hello-world $NODE_IP datadog
-```
+- `service`: An identifier for the test case.
+- `language`: The language the app is implemented in
+- `route`: The HTTP route for the component to be tested
 
-This will start the K6 test, which will create a `SpinApp` and an `Ingress` in your Kubernetes cluster and perform the tests defined in the script. At the end of the test, it will delete the created Kubernetes resources. Test results should be visible in Datadog.
+The following are specific to the density test
 
-### Creating a Test Configuration File
+- `registry`: The registry path prefix for all the apps
+- `batch_size`: How many apps to deploy for each test run
 
-The test configuration file is a JSON file that contains an array of objects. Each object represents a test case and has the following properties:
-
-- `name`: An identifier for the test case.
-- `image`: The SpinApp OCI image to be used for the test.
-- `language`: (optional) The language the app is implemented in
-
-There is no maximum number of scenarios that a configuration file can contain. When running a test, the scenario ID is specified in the `TESTCASE_NAME` environment variable, which instructs the K6 test to filter for that entry in the list and deploy those resources. See the [hello-world test configuration](./tests/hello-world/test-config.json) for an example.
+There is no maximum number of scenarios that a test case file can contain.
