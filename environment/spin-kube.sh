@@ -47,11 +47,16 @@ install_datadog() {
     #
     # Note: also possible to supply a secret for the API key
     # https://github.com/DataDog/helm-charts/tree/main/charts/datadog#create-and-provide-a-secret-that-contains-your-datadog-api-and-app-keys
+    #
+    # Note: we set the nodeSelector for all components to run on the system nodes EXCEPT
+    # the agents, as we of course need an agent present on the apps node to capture data
+    # and forward on to Datadog
     helm upgrade --install datadog \
       --namespace datadog \
       --create-namespace \
-      --set agents.nodeSelector.workload=system \
       --set clusterAgent.nodeSelector.workload=system \
+      --set clusterChecksRunner.nodeSelector.workload=system \
+      --set kube-state-metrics.nodeSelector.workload=system \
       --set datadog.kubelet.host.valueFrom.fieldRef.fieldPath=spec.nodeName \
       --set datadog.kubelet.hostCAPath=/etc/kubernetes/certs/kubeletserver.crt \
       --set datadog.apiKey="${DATADOG_API_KEY}" datadog/datadog
