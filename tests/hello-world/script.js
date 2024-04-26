@@ -69,7 +69,7 @@ export function setup() {
   );
   console.log("Creating SpinApp: " + JSON.stringify(spinApp));
   kubernetes.create(spinApp);
-  const timeout = 30;
+  const timeout = 60;
   if (!waitAllAppsReady(kubernetes, timeout, namespace, replicas)) {
       console.error(`SpinApp not ready after ${timeout} seconds`);
       return;
