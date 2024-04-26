@@ -9,7 +9,7 @@ spec:
   script:
     configMap:
       name: $name
-      file: script.js
+      file: archive.tar
   arguments: ""
   separate: false
   runner:

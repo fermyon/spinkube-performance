@@ -5,7 +5,7 @@ source $(dirname $(realpath "$0"))/../utils.sh
 
 wait_for_testrun() {
     local name=$1
-    local max_duration=${2:-90}
+    local max_duration=${2:-300}
     local status
     local timeout=$((SECONDS+max_duration))
 
@@ -17,12 +17,15 @@ wait_for_testrun() {
             echo "TestRun $name did not finish in $max_duration seconds"
             exit 1
         fi
-        echo "TestRun $name is $status"
+        echo "TestRun $name status: $status"
         sleep 3
         status=$(kubectl get testrun $name -o jsonpath='{.status.stage}')
     done
-    if [[ $status == "error" || $status == "stopped" ]]; then
-        echo "TestRun $name failed with status $status"
+    # The TestRun reports a status of "finished" even if it errored out, so
+    # check job status instead
+    res=$(kubectl get job $name-1  -o jsonpath='{.status.failed}')
+    if [[ res -ne 0 ]]; then
+        echo "TestRun $name failed with Job 'failed' status"
         exit 1
     fi
     echo "TestRun $name succeeded"
@@ -34,17 +37,23 @@ TEST=${TEST:-"hello-world"}
 OUTPUT=${OUTPUT:-"datadog"}
 SPIN_V_VERSION=${SPIN_V_VERSION:-"2.4.2"}
 # Navigate to the directory containing the script
-path="$(dirname "$0")/$TEST"
+path="$(dirname "$0")"
 echo "path is $path"
 
 # Check for required binaries
-for binary in jq yq kubectl; do
+for binary in jq yq kubectl go; do
   which_binary "$binary"
 done
 
+# If k6 does not exist, build it
+if ! [[ -x "./k6" ]]; then
+    echo "k6 not found, building it..."
+    make k6-build
+fi
+
 # Apply RBAC for K6 tests
-kubectl apply -f $path/../rbac.yaml
-test_config_json=$(cat $path/test-config.json)
+kubectl apply -f $path/rbac.yaml
+test_config_json=$(cat $path/cases/$TEST.json)
 
 # Loop through each entry in the JSON array
 for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
@@ -62,14 +71,16 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
     export executor=${EXECUTOR:-"containerd-shim-spin"}
     export runner_image=$REGISTRY_URL/k6:latest
     export timestamp=$(date "+%Y-%m-%d-%H:%M:%S")
+    echo "Running test $name"
+    # Create a tar archive of the test script and helper functions
+    ./k6 archive $path/$TEST.js
 
     # Create the script ConfigMap
     kubectl get configmap $name >/dev/null 2>&1 || \
-        kubectl create configmap $name --from-file $path/script.js
+        kubectl create configmap $name --from-file=archive.tar
 
     # Create temporary test run resource to customize per test app
     tempfile="$(mktemp -d)/test-run-$name.yaml"
-    echo "Temporary TestRun resource: $tempfile"
     cp $path/test-run.yaml $tempfile
 
     # Update with common values regardless of output method
@@ -80,11 +91,14 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
         (.spec.arguments += " --tag timestamp=") |
         (.spec.arguments += env(timestamp)) |
         (.spec.runner.env += {"name": "SERVICE","value": env(name)}) |
-        (.spec.runner.env += {"name": "ROUTE","value": env(route)}) |
         (.spec.runner.env += {"name": "EXECUTOR","value": env(executor)}) |
         (.spec.runner.env += {"name": "IMAGE","value": env(image)}) |
         (.spec.runner.metadata.labels.language = env(language)) |
         (.spec.script.configMap.name = env(name))' $tempfile
+
+    if [[ -x "$route" ]]; then
+        yq -i '(.spec.runner.env += {"name": "ROUTE","value": env(route)})' $tempfile
+    fi
 
     # Run command with the appropriate output
     if [ "$OUTPUT" == "prometheus" ];
@@ -109,7 +123,19 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
         # TODO: write results summary to a file on the node?
     fi
 
+    if [[ "$TEST" == "density" ]]; then
+    echo "Running density test"
+        export registry=$(_jq '.registry')
+        export batch_size=$(_jq '.batch_size')
+        yq -i '(.spec.runner.env += {"name": "REGISTRY_BASE","value": env(registry)}) |
+            (.spec.runner.env += {"name": "BATCH_SIZE","value": strenv(batch_size)})' $tempfile
+    fi
+    cat $tempfile
     kubectl apply -f $tempfile
 
     wait_for_testrun $name
 done
+
+if [[ "$TEST" == "density" ]]; then
+    echo "kubectl delete spinapp --all"
+fi

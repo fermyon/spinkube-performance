@@ -1,0 +1,50 @@
+[
+    {
+        "service": "density-0",
+        "registry": "rg.fr-par.scw.cloud/dlancshire-public/template-app-",
+
+        "batch_size": "10",
+        "language": "rust",
+        "route": ""
+    },
+    {
+        "service": "density-1",
+        "registry": "rg.fr-par.scw.cloud/dlancshire-public/template-app-",
+
+        "batch_size": "10",
+        "language": "rust",
+        "route": ""
+    },
+    {
+        "service": "density-2",
+        "registry": "rg.fr-par.scw.cloud/dlancshire-public/template-app-",
+
+        "batch_size": "10",
+        "language": "rust",
+        "route": ""
+    },
+    {
+        "service": "density-3",
+        "registry": "rg.fr-par.scw.cloud/dlancshire-public/template-app-",
+
+        "batch_size": "10",
+        "language": "rust",
+        "route": ""
+    },
+    {
+        "service": "density-4",
+        "registry": "rg.fr-par.scw.cloud/dlancshire-public/template-app-",
+
+        "batch_size": "10",
+        "language": "rust",
+        "route": ""
+    },
+    {
+        "service": "density-5",
+        "registry": "rg.fr-par.scw.cloud/dlancshire-public/template-app-",
+
+        "batch_size": "10",
+        "language": "rust",
+        "route": ""
+    }
+]
