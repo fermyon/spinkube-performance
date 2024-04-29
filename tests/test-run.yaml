@@ -15,6 +15,15 @@ spec:
   runner:
     image: $runner_image
     serviceAccountName: k6-service-account
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: runtime
+              operator: NotIn
+              values:
+              - containerd-shim-spin
     env: []
     metadata:
       labels:

@@ -2,20 +2,22 @@ import http from 'k6/http';
 import { check } from 'k6';
 import { Kubernetes } from 'k6/x/kubernetes';
 import * as deploy from "./common/common.js";
-import { Trend, Counter } from 'k6/metrics';
+import { Gauge, Counter } from 'k6/metrics';
 import exec from 'k6/execution';
 import { sleep } from 'k6';
 
 export let options = {
   stages: [
-    { target: 200, duration: '10s' }
+    { target: 20, duration: '10s' },
+    { target: 0, duration: '10s' }
   ],
-  setupTimeout: '120s',
+  setupTimeout: '300s',
+  noConnectionReuse: true
 };
 
-const timeToDeployTenApps = new Trend('time_to_deploy_ten_apps');
-const deployedApps = new Counter('deployed_apps');
-const waitAppsReadyTimeout = 120;
+const timeToDeployTenApps = new Gauge('time_to_deploy_ten_apps');
+const deployedApps = new Gauge('deployed_apps');
+const waitAppsReadyTimeout = 300;
 
 class TestEndpoint {
   constructor(name, endpoint) {
@@ -57,8 +59,9 @@ function applySpinApps(kubernetes, spinApps, testConfig) {
   if (timeToReady === -1) {
     exec.test.abort(`SpinApps not ready after ${waitAppsReadyTimeout} seconds after deploying ${i - 1} apps`);
   }
-  timeToDeployTenApps.add(timeToReady);
-  deployedApps.add(spinApps.length);
+  timeToDeployTenApps.add(timeToReady, true);
+  let totalAppsDeployed = deploy.getSpinApps(kubernetes, testConfig.namespace).length;
+  deployedApps.add(totalAppsDeployed);
   return endpoints;
 }
 
@@ -74,6 +77,8 @@ export function setup() {
   let baseOciEndpoint = `${__ENV.REGISTRY_BASE}` != "undefined" ? `${__ENV.REGISTRY_BASE}` : "rg.fr-par.scw.cloud/dlancshire-public/template-app-";
   let batchSize = `${__ENV.BATCH_SIZE}` != "undefined" ? `${__ENV.BATCH_SIZE}` : 10;
   let batchNumber = baseTestConfig.name.includes("density") ? parseInt(baseTestConfig.name.split("-")[1]) : 0;
+  let totalAppsDeployed = deploy.getSpinApps(kubernetes, testConfig.namespace).length;
+  deployedApps.add(totalAppsDeployed);
   let apps = createSpinApps(baseOciEndpoint, batchNumber, batchSize, baseTestConfig);
   console.log(`Density test configured for batch ${batchNumber} of ${batchSize} apps`);
   let endpoints = applySpinApps(kubernetes, apps, baseTestConfig);
@@ -87,17 +92,14 @@ export function setup() {
  * @param {string} data - The URL to send the request to.
  */
 export default function(endpoints) {
-  const response = http.batch(endpoints.map((endpoint) => ({
-    method: 'GET',
-    url: endpoint.endpoint,
-  })));
-  for (let j = 0; j < response.length; j++) {
-    check(response[j], {
+  for(let i = 0; i < endpoints.length; i++) {
+    const res = http.get(endpoints[i].endpoint);
+    check(res, {
       "response code was 200": (res) => res.status == 200,
       "body message started with 'Hello'": (res) => typeof res.body === 'string' && (res.body.trim().includes("Hello"))
     });
+    sleep(0.1);
   }
-  sleep(0.1);
 }
 
 /**
