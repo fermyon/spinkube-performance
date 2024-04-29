@@ -94,18 +94,3 @@ sed -i '' 's/0\.0\.0\.0/<NODE_IP>/g' $HOME/.kube/config
      vus............................: 19      min=0        max=200
      vus_max........................: 200     min=200      max=200
      ```
-
-### Creating a Test Case File
-
-A set of [test cases](./tests/cases/) for a script can be described in a JSON file that contains an array of objects. This file is ingested by the [`run.sh`](./tests/run.sh) script which transforms the fields into environment variables for the K6 script (or tags in the case of `language`). The following is a list of the fields the `run.sh` script can handle:
-
-- `service`: An identifier for the test case.
-- `language`: The language the app is implemented in
-- `route`: The HTTP route for the component to be tested
-
-The following are specific to the density test
-
-- `registry`: The registry path prefix for all the apps
-- `batch_size`: How many apps to deploy for each test run
-
-There is no maximum number of scenarios that a test case file can contain.

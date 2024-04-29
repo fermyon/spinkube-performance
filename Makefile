@@ -8,7 +8,7 @@ k6-build:
 
 build-k6-image:
 	cd image/k6 && \
-	docker build --platform linux/amd64,linux/arm64 -t $(REGISTRY_URL)/k6:latest .
+	docker build --platform linux/arm64 -t $(REGISTRY_URL)/k6:latest .
 
 push-k6-image:
 	docker push $(REGISTRY_URL)/k6:latest
@@ -18,7 +18,7 @@ build-and-push-apps:
 
 run-tests:
 	TEST=hello-world ./tests/run.sh $(REGISTRY_URL)
-	TEST=density ./tests/run.sh $(REGISTRY_URL)
+	SPIN_APP_REGISTRY_URL="rg.fr-par.scw.cloud/dlancshire-public/template-app-" TEST=density ./tests/run.sh $(REGISTRY_URL)
 
 cleanup: cleanup-apps cleanup-tests
 
