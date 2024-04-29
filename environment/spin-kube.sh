@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-source $(dirname $(realpath "$0"))/../utils.sh
+SCRIPT_PATH=$(dirname $(realpath "$0"))
+source "${SCRIPT_PATH}/../utils.sh"
 
 SHIM_VERSION=${SHIM_VERSION:-v0.13.1}
 DATADOG_API_KEY=${DATADOG_API_KEY:-''}
@@ -101,7 +102,7 @@ install_k6_operator() {
 
 install_spin_operator() {
   # Apply Spin runtime class
-  kubectl apply -f runtime-class.yaml
+  kubectl apply -f "${SCRIPT_PATH}/runtime-class.yaml"
 
   # Apply Spin CRDs
   kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0/spin-operator.crds.yaml
