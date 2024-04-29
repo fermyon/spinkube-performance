@@ -42,15 +42,9 @@ path="$(dirname "$0")"
 echo "path is $path"
 
 # Check for required binaries
-for binary in jq yq kubectl go; do
+for binary in docker jq yq kubectl; do
   which_binary "$binary"
 done
-
-# If k6 does not exist, build it
-if ! [[ -x "./k6" ]]; then
-    echo "k6 not found, building it..."
-    make k6-build
-fi
 
 # Apply RBAC for K6 tests
 kubectl apply -f $path/rbac.yaml
@@ -73,8 +67,12 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
     export runner_image=$REGISTRY_URL/k6:latest
     export test_id=$TEST_ID
     echo "Running test $name"
-    # Create a tar archive of the test script and helper functions
-    ./k6 archive $path/$TEST.js
+
+    # Create a tar archive of the test script and helper functions via the k6 runner image
+    docker run --rm \
+        -u $(id -u ${USER}):$(id -g ${USER}) \
+        -v "$(pwd):/workdir" \
+        -w /workdir "${runner_image}" archive "${path}/${TEST}.js"
 
     # Create the script ConfigMap
     kubectl get configmap $name >/dev/null 2>&1 || \
