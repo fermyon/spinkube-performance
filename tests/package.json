@@ -1,0 +1,24 @@
+{
+  "name": "spinkube-performance-tests",
+  "version": "0.0.1",
+  "description": "SpinKube Performance Tests",
+  "main": "TODO",
+  "scripts": {
+    "test": "npx eslint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kate-goldenring/performance.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/kate-goldenring/performance/issues"
+  },
+  "homepage": "https://github.com/kate-goldenring/performance#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.1.1",
+    "eslint": "^9.1.1",
+    "globals": "^15.1.0"
+  }
+}
