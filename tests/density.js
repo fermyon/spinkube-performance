@@ -77,7 +77,7 @@ export function setup() {
   let baseOciEndpoint = `${__ENV.REGISTRY_BASE}` != "undefined" ? `${__ENV.REGISTRY_BASE}` : "rg.fr-par.scw.cloud/dlancshire-public/template-app-";
   let batchSize = `${__ENV.BATCH_SIZE}` != "undefined" ? `${__ENV.BATCH_SIZE}` : 10;
   let batchNumber = baseTestConfig.name.includes("density") ? parseInt(baseTestConfig.name.split("-")[1]) : 0;
-  let totalAppsDeployed = deploy.getSpinApps(kubernetes, testConfig.namespace).length;
+  let totalAppsDeployed = deploy.getSpinApps(kubernetes, baseTestConfig.namespace).length;
   deployedApps.add(totalAppsDeployed);
   let apps = createSpinApps(baseOciEndpoint, batchNumber, batchSize, baseTestConfig);
   console.log(`Density test configured for batch ${batchNumber} of ${batchSize} apps`);
