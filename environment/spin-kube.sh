@@ -101,7 +101,7 @@ install_k6_operator() {
 
 install_spin_operator() {
   # Apply Spin runtime class
-  kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0/spin-operator.runtime-class.yaml
+  kubectl apply -f runtime-class.yaml
 
   # Apply Spin CRDs
   kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0/spin-operator.crds.yaml

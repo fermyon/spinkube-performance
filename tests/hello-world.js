@@ -9,6 +9,7 @@ export let options = {
     { target: 200, duration: '10s' },
     { target: 0, duration: '10s' },
   ],
+  noConnectionReuse: true
 };
 
 function applySpinApp(kubernetes, testConfig) {
