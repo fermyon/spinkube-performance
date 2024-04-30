@@ -27,8 +27,11 @@ export let options = {
   tags: {
     test: testName,
   },
+  thresholds: {
+    // the rate of successful checks should be higher than 90%
+    checks: ['rate>0.90'],
+  },
   noConnectionReuse: true,
-  discardResponseBodies: true,
   setupTimeout: '120s',
   scenarios: {
     deploy1: {
@@ -70,14 +73,14 @@ export let options = {
       iterations: 1,
       vus: 1,
       maxDuration: `${maxScenarioDurationSecs}s`,
-      startTime: `${maxScenarioDurationSecs * 1 + restIntervalSecs * 2}s`,
+      startTime: `${maxScenarioDurationSecs * 2 + restIntervalSecs * 3}s`,
       env: { BATCH_NUMBER: '2', BATCH_SIZE: '10' },
     },
     test3: {
       executor: 'constant-vus',
       vus: 20,
       exec: 'test',
-      startTime: `${maxScenarioDurationSecs * 2 + restIntervalSecs * 2}s`,
+      startTime: `${maxScenarioDurationSecs * 3 + restIntervalSecs * 3}s`,
       env: { BATCH_NUMBER: '2', BATCH_SIZE: '10' },
       duration: '10s',
     },
@@ -87,14 +90,14 @@ export let options = {
       iterations: 1,
       vus: 1,
       maxDuration: `${maxScenarioDurationSecs}s`,
-      startTime: `${maxScenarioDurationSecs * 1 + restIntervalSecs * 2}s`,
+      startTime: `${maxScenarioDurationSecs * 3 + restIntervalSecs * 4}s`,
       env: { BATCH_NUMBER: '3', BATCH_SIZE: '10' },
     },
     test4: {
       executor: 'constant-vus',
       vus: 20,
       exec: 'test',
-      startTime: `${maxScenarioDurationSecs * 2 + restIntervalSecs * 2}s`,
+      startTime: `${maxScenarioDurationSecs * 4 + restIntervalSecs * 4}s`,
       env: { BATCH_NUMBER: '3', BATCH_SIZE: '10' },
       duration: '10s',
     },
@@ -104,14 +107,14 @@ export let options = {
       iterations: 1,
       vus: 1,
       maxDuration: `${maxScenarioDurationSecs}s`,
-      startTime: `${maxScenarioDurationSecs * 1 + restIntervalSecs * 2}s`,
+      startTime: `${maxScenarioDurationSecs * 4 + restIntervalSecs * 5}s`,
       env: { BATCH_NUMBER: '4', BATCH_SIZE: '10' },
     },
     test5: {
       executor: 'constant-vus',
       vus: 20,
       exec: 'test',
-      startTime: `${maxScenarioDurationSecs * 2 + restIntervalSecs * 2}s`,
+      startTime: `${maxScenarioDurationSecs * 5 + restIntervalSecs * 5}s`,
       env: { BATCH_NUMBER: '4', BATCH_SIZE: '10' },
       duration: '10s',
     },
@@ -131,7 +134,7 @@ function createSpinApps(imagePrefix, batchNumber, batchSize) {
   for (let i = 0; i < batchSize; i++) {
     let appNum = batchNumber * batchSize + i + 1;
     console.log(`Creating SpinApp ${testName}-${appNum}`);
-      let image = `${imagePrefix}${appNum}:latest`;
+      let image = `${imagePrefix}${appNum}:${tag}`;
       let app = new deploy.SpinApp(
         `${testName}-${appNum}`,
         {
@@ -160,6 +163,7 @@ function applySpinApps(kubernetes, spinApps) {
   timeToDeployTenApps.add(timeToReady, true);
   let totalAppsDeployed = deploy.getSpinApps(kubernetes, namespace).length;
   deployedApps.add(totalAppsDeployed);
+  console.log(`Deployed ${totalAppsDeployed} apps`);
 }
 
 /**
@@ -199,12 +203,14 @@ export function deployApps() {
 export function test(endpoints) {
   let batchSize = `${__ENV.BATCH_SIZE}` != "undefined" ? `${__ENV.BATCH_SIZE}` : 10;
   let batchNumber = `${__ENV.BATCH_NUMBER}` != "undefined" ? `${__ENV.BATCH_NUMBER}` : 0;
-  for(let i = 0; i < batchNumber * batchSize + batchSize; i++) {
+  let totalAppsDeployed = batchNumber * batchSize + batchSize; 
+  for(let i = 0; i < totalAppsDeployed; i++) {
     const res = http.get(endpoints[i].endpoint);
     check(res, {
       "response code was 200": (res) => res.status == 200,
       "body message started with 'Hello'": (res) => typeof res.body === 'string' && (res.body.trim().includes("Hello"))
-    });
+    },
+    { apps: totalAppsDeployed });
     sleep(0.1);
   }
 }
@@ -214,7 +220,8 @@ export function test(endpoints) {
  * It deletes the SpinApp custom resource from the Kubernetes cluster.
  */
 export function teardown(endpoints) {
-  console.log("Skipping teardown for density test")
+  console.log("Tearing down density test");
+  const kubernetes = new Kubernetes();
   for (let i = 0; i < endpoints.length; i++) {
     kubernetes.delete("SpinApp.core.spinoperator.dev", endpoints[i].name, namespace);
   }

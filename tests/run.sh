@@ -33,7 +33,7 @@ wait_for_testrun() {
 
 # TODO: change default to repo name
 REGISTRY_URL=${1:-"ghcr.io/kate-goldenring/performance"}
-SPIN_APP_REGISTRY_URL=${SPIN_APP_REGISTRY_URL:-"ghcr.io/kate-goldenring/performance"}
+SPIN_APP_REGISTRY_URL=${SPIN_APP_REGISTRY_URL:-"${REGISTRY_URL}"}
 TEST=${TEST:-"hello-world"}
 OUTPUT=${OUTPUT:-"datadog"}
 SPIN_V_VERSION=${SPIN_V_VERSION:-"2.4.2"}
@@ -81,8 +81,13 @@ yq -i '(.spec.runner.image = env(runner_image)) |
     (.spec.arguments += env(test_id)) |
     (.spec.runner.env += {"name": "REPO","value": env(repo)}) |
     (.spec.runner.env += {"name": "EXECUTOR","value": env(executor)}) |
-    (.spec.runner.env += {"name": "TAG","value": env(tag)}) |
     (.spec.script.configMap.name = env(name))' $tempfile
+
+if [[ "$TEST" == "density" ]]; then
+    export tag="latest"
+fi
+
+yq -i '(.spec.runner.env += {"name": "TAG","value": env(tag)})' $tempfile
 
 # Run command with the appropriate output
 if [ "$OUTPUT" == "prometheus" ];
