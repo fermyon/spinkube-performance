@@ -20,10 +20,13 @@ run-tests:
 	TEST=hello-world ./tests/run.sh $(REGISTRY_URL)
 	SPIN_APP_REGISTRY_URL="rg.fr-par.scw.cloud/dlancshire-public/template-app-" TEST=density ./tests/run.sh $(REGISTRY_URL)
 
-cleanup: cleanup-apps cleanup-tests
+cleanup: cleanup-apps cleanup-tests cleanup-configmaps
 
 cleanup-apps:
 	source utils.sh && delete_k8s_resources spinapps
 
 cleanup-tests:
 	source utils.sh && delete_k8s_resources testruns
+
+cleanup-configmaps:
+	kubectl delete configmap -l k6-test=true
