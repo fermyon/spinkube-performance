@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { check } from 'k6';
 import { Kubernetes } from 'k6/x/kubernetes';
 import * as deploy from "./common/common.js";
-import { Gauge, Counter } from 'k6/metrics';
+import { Gauge } from 'k6/metrics';
 import exec from 'k6/execution';
 import { sleep } from 'k6';
 
@@ -106,12 +106,7 @@ export default function(endpoints) {
  * Teardown function that is executed after the test ends.
  * It deletes the SpinApp custom resource from the Kubernetes cluster.
  */
-export function teardown(endpoints) {
+export function teardown() {
   // SKIPPED: as this test is often run multiple times to build up density
   console.log("Skipping teardown for density test")
-  // let namespace = `${__ENV.NAMESPACE}` != "undefined" ? `${__ENV.NAMESPACE}` : "default";
-  // const kubernetes = new Kubernetes();
-  // for (let i = 0; i < endpoints.length; i++) {
-  //   kubernetes.delete("SpinApp.core.spinoperator.dev", endpoints[i].name, namespace);
-  // }
 }

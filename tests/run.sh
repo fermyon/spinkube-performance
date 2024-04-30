@@ -72,7 +72,7 @@ for entry in $(echo "$test_config_json" | jq -r '.[] | @base64'); do
     docker run --rm \
         -u $(id -u ${USER}):$(id -g ${USER}) \
         -v "$(pwd):/workdir" \
-        -w /workdir "${runner_image}" archive "${path}/${TEST}.js"
+        -w /workdir "${runner_image}" archive "${path}/scripts/${TEST}.js"
 
     # Create the script ConfigMap
     kubectl get configmap $name >/dev/null 2>&1 || \
