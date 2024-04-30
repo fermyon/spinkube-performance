@@ -25,9 +25,6 @@ spec:
               values:
               - containerd-shim-spin
     env: []
-    metadata:
-      labels:
-        language: $language
     securityContext:
       runAsUser: 1000
       runAsGroup: 1000

@@ -1,12 +1,5 @@
 import { sleep } from 'k6';
 
-export let options = {
-  stages: [
-    { target: 200, duration: '10s' },
-    { target: 0, duration: '10s' },
-  ],
-};
-
 /**
  * Resource representing a SpinApp deployment configuration.
  * @type {object}
@@ -20,44 +13,13 @@ export class SpinApp {
   }
 }
 
-/**
- * Resource containing information about the app to be tested 
- * in subsequent test stages and teardown.
- * @type {object}
- */
-export class TestConfig {
-  constructor(name, namespace, endpoint, replicas, image, executor) {
-    this.name = name;
-    this.namespace = namespace;
-    this.endpoint = endpoint;
-    this.replicas = replicas;
-    this.image = image;
-    this.executor = executor;
-  }
-}
-
-export function test_config_from_env() {
-  let executor = `${__ENV.EXECUTOR}` != "undefined" ? `${__ENV.EXECUTOR}` : "containerd-shim-spin";
-  let appName = `${__ENV.SERVICE}`;
-  if (appName == "undefined") {
-    console.error("SERVICE is not defined in the environment variables.");
-    return;
-  }
-  let image = `${__ENV.IMAGE}`;
-  if (image == "undefined") {
-    image = `ghcr.io/performance/${appName}:latest`;
-    console.log("IMAGE is not defined in the environment variables. Defaulting to " + image);
-  }
-  let namespace = `${__ENV.NAMESPACE}` != "undefined" ? `${__ENV.NAMESPACE}` : "default";
-  let replicas = `${__ENV.REPLICAS}` != "undefined" ? `${__ENV.REPLIAS}` : 1;
-  let route = `${__ENV.ROUTE}` != "undefined" ? `${__ENV.ROUTE}` : "";
-  let endpoint = serviceEndpointForApp(appName, namespace, route);
-  return new TestConfig(appName, namespace, endpoint, replicas, image, executor);
-}
-
 export function serviceEndpointForApp(appName, namespace, route) {
   let endpoint = `http://${appName}.${namespace}.svc.cluster.local/${route}`;
   return endpoint;
+}
+
+export function imageForApp(repo, tag, appName) {
+  return `${repo}/${appName}:${tag}`;
 }
 
 export function getSpinApps(kubernetes, namespace) {

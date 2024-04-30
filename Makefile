@@ -18,7 +18,7 @@ build-and-push-apps:
 
 run-tests:
 	TEST=hello-world ./tests/run.sh $(REGISTRY_URL)
-	TEST=density ./tests/run.sh $(REGISTRY_URL)
+	SPIN_APP_REGISTRY_URL="rg.fr-par.scw.cloud/dlancshire-public/template-app-" TEST=density ./tests/run.sh $(REGISTRY_URL)
 
 cleanup: cleanup-apps cleanup-tests
 
