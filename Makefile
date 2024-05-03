@@ -29,12 +29,17 @@ run-hello-world-test:
 	echo "Logs from Hello World Test"
 	kubectl logs job/hello-world-1
 
+run-ramping-rps-test-%:
+	REPLICAS=$* TEST=ramping-rps NAME=ramping-rps-$* ./tests/run.sh $(REGISTRY_URL)
+	echo "Logs from Ramp Test"
+	kubectl logs job/ramping-rps-$*-1
+
 run-ramping-vus-test-%:
 	REPLICAS=$* TEST=ramping-vus NAME=ramping-vus-$* ./tests/run.sh $(REGISTRY_URL)
 	echo "Logs from Ramp Test"
 	kubectl logs job/ramping-vus-$*-1
 
-run-tests: run-hello-world-test run-ramping-vus-test-1 run-ramping-vus-test-10 run-density-tests
+run-tests: run-hello-world-test run-ramping-rps-test-1 run-density-tests
 
 cleanup: cleanup-apps cleanup-tests cleanup-configmaps
 

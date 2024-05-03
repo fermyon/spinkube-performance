@@ -2,19 +2,20 @@ import http from 'k6/http';
 import { Kubernetes } from 'k6/x/kubernetes';
 import * as deploy from "./common/common.js";
 import { sleep } from 'k6';
-const testName = "ramping-vus";
-const route = "hello"
-const replicas = `${__ENV.REPLICAS}` != "undefined" ? parseInt(`${__ENV.REPLICAS}`) : 1;
-const namespace = `${__ENV.NAMESPACE}` != "undefined" ? `${__ENV.NAMESPACE}` : "default";
-let executor = `${__ENV.EXECUTOR}` != "undefined" ? `${__ENV.EXECUTOR}` : "containerd-shim-spin";
-let repo = `${__ENV.REPO}` != "undefined" ? `${__ENV.REPO}` : "ghcr.io/kate-goldenring/performance";
-let tag = `${__ENV.TAG}` != "undefined" ? `${__ENV.TAG}` : "latest";
-let name = `${__ENV.NAME}` != "undefined" ? `${__ENV.NAME}` : "ramping-vus";
-let appToTest = `${__ENV.APP}` != "undefined" ? `${__ENV.APP}` : "hello-world-rust";
+
+const testScriptName = "ramping-rps";
+const replicas = `${__ENV.SK_REPLICAS}` != "undefined" ? parseInt(`${__ENV.SK_REPLICAS}`) : 1; 
+const namespace = `${__ENV.SK_NAMESPACE}` != "undefined" ? `${__ENV.SK_NAMESPACE}` : "default";
+const executor = `${__ENV.SK_EXECUTOR}` != "undefined" ? `${__ENV.SK_EXECUTOR}` : "containerd-shim-spin";
+const repo = `${__ENV.SK_OCI_REPO}` != "undefined" ? `${__ENV.SK_OCI_REPO}` : "ghcr.io/kate-goldenring/performance";
+const tag = `${__ENV.SK_OCI_TAG}` != "undefined" ? `${__ENV.SK_OCI_TAG}` : "latest";
+const route = `${__ENV.SK_SPIN_APP_ROUTE}` != "undefined" ? `${__ENV.SK_SPIN_APP_ROUTE}` : "";
+const appToTest = `${__ENV.SK_SPIN_APP}` != "undefined" ? `${__ENV.SK_SPIN_APP}` : "hello-world-rust";
+const name = `${__ENV.SK_TEST_RUN_NAME}` != "undefined" ? `${__ENV.SK_TEST_RUN_NAME}` : testScriptName;
 
 export let options = {
   tags: {
-    test: testName,
+    test: testScriptName
   },
   thresholds: {
     http_req_failed: ['rate<0.1'],
@@ -23,20 +24,27 @@ export let options = {
   noConnectionReuse: false,
   discardResponseBodies: true,
   scenarios: {
-    ramping_vus: {
-      executor: 'ramping-vus',
-      startVUs: 0,
+    ramping_rps: {
+      executor: 'ramping-arrival-rate',
+
+      // Start iterations per `timeUnit`
+      startRate: 100,
+
+      // Start `startRate` iterations per second
+      timeUnit: '1s',
+
+      // Pre-allocate necessary VUs.
+      preAllocatedVUs: 50,
+
       stages: [
-        { duration: '30s', target: 10 },
-        { duration: '30s', target: 20 },
-        { duration: '30s', target: 30 },
-        { duration: '30s', target: 40 },
-        { duration: '30s', target: 50 },
-        { duration: '60s', target: 100 },
-        { duration: '60s', target: 200 },
-        { duration: '60s', target: 300 },
+        // Start 50 iterations per `timeUnit` for the first 1m.
+        { target: 100, duration: '1m' },
+        { target: 500, duration: '1m' },
+        { target: 1000, duration: '1m' },
+        { target: 2000, duration: '1m' },
+        { target: 5000, duration: '1m' },
       ],
-      gracefulRampDown: '10s',
+      maxVUs: 100,
     },
   },
 };
@@ -69,7 +77,6 @@ export default function (endpoint) {
   http.get(endpoint, {tags: {
     replicas: replicas,
   }});
-  sleep(0.1);
 }
 
 /**
