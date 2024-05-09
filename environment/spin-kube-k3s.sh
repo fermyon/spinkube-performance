@@ -3,7 +3,7 @@ set -euo pipefail
 
 source $(dirname $(realpath "$0"))/spin-kube.sh
 
-SHIM_VERSION=${1:-v0.13.1}
+SHIM_VERSION=${1:-v0.14.1}
 NODE_IP=${2:-""}
 
 # List of binary names

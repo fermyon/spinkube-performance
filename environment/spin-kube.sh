@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_PATH=$(dirname $(realpath "$0"))
 source "${SCRIPT_PATH}/../utils.sh"
 
-SHIM_VERSION=${SHIM_VERSION:-v0.13.1}
+SHIM_VERSION=${SHIM_VERSION:-v0.14.1}
 DATADOG_API_KEY=${DATADOG_API_KEY:-''}
 READINESS_TIMEOUT=${READINESS_TIMEOUT:-20s}
 
