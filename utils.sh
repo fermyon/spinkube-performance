@@ -42,11 +42,17 @@ export_node_info() {
   executor=${EXECUTOR:-"containerd-shim-spin"}
 
   # Get architecture and OS of node provisioned by runtime installer (and labeled with 'runtime=containerd-shim-spin')
-  node_info=$(kubectl get nodes -l runtime=$executor -o json|jq -Cjr '.items[] | .metadata.name," ",.metadata.labels."beta.kubernetes.io/os"," ",.metadata.labels."beta.kubernetes.io/arch"," ",.metadata.labels."beta.kubernetes.io/instance-type", "\n"'| head)
+  node_info=$(kubectl get nodes -l runtime=$executor -o json | \
+    jq -Cjr '.items[] | .metadata.name,"
+      ",.metadata.labels."beta.kubernetes.io/os","
+      ",.metadata.labels."beta.kubernetes.io/arch","
+      ",.metadata.labels."beta.kubernetes.io/instance-type","
+      ",.metadata.annotations."shim_version", "\n"' | head)
   cluster_name=$(kubectl config current-context)
   node_name="$(echo $node_info | cut -d' ' -f1)"
   export NODE_HOST="${node_name}-${cluster_name}"
   export NODE_OS="$(echo $node_info | cut -d' ' -f2)"
   export NODE_ARCH="$(echo $node_info | cut -d' ' -f3)"
   export NODE_INSTANCE_TYPE="$(echo $node_info | cut -d' ' -f4)"
+  export NODE_SHIM_VERSION="$(echo $node_info | cut -d' ' -f5)"
 }
