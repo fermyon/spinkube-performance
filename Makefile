@@ -21,6 +21,7 @@ run-density-test-%:
 	TEST=density \
 	SK_TEST_RUN_NAME=density-$* \
 	SK_SPIN_APP_ROUTE="" \
+	SK_SPIN_VERSION="$(SPIN_V_VERSION)" \
 	SK_OCI_TAG="perf" \
 	SK_OCI_REPO=$(REGISTRY_URL) \
 	./tests/run.sh $(REGISTRY_URL)
