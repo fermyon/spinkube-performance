@@ -25,7 +25,7 @@ export let options = {
   setupTimeout: '300s',
   noConnectionReuse: false,
   discardResponseBodies: true,
-  executor: 'constant-vus',
+  // executor: 'constant-vus', // this is the default executor and implied
   vus: 20,
   duration: testDuration,
 };
