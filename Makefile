@@ -21,7 +21,7 @@ run-density-test-%:
 	TEST=density \
 	SK_TEST_RUN_NAME=density-$* \
 	SK_SPIN_APP_ROUTE="" \
-	SK_OCI_TAG="latest" \
+	SK_OCI_TAG="perf" \
 	SK_OCI_REPO=$(REGISTRY_URL) \
 	./tests/run.sh $(REGISTRY_URL)
 	echo "Logs from Density Test $*"
