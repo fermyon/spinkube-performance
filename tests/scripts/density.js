@@ -65,6 +65,12 @@ function createSpinApps(imagePrefix, numDeployed, batchSize) {
   return apps;
 }
 
+/**
+ * Apply the SpinApp custom resources to the Kubernetes cluster.
+ * @param {Kubernetes} kubernetes - The Kubernetes client to use.
+ * @param {Array} spinApps - The SpinApp custom resources to apply.
+ * @returns {number} The time it took for all the apps to be ready.
+ */
 function applySpinApps(kubernetes, spinApps) {
   console.log(`Applying ${spinApps.length} SpinApp custom resources to the cluster`)
   let i
@@ -77,7 +83,7 @@ function applySpinApps(kubernetes, spinApps) {
   if (timeToReady === -1) {
     exec.test.abort(`SpinApps not ready after ${timeout} seconds after deploying ${i - 1} apps`);
   }
-  timeToDeployTenApps.add(timeToReady);
+  return timeToReady
 }
 
 /**
@@ -91,10 +97,11 @@ export function setup() {
   let startQuantity = allApps == 0 ? 0 : allApps;
   console.log(`Deploying ${batchSize} apps to cluster with ${startQuantity} already deployed`);
   let apps = createSpinApps(`${repo}/density-rust-`, startQuantity, batchSize);
-  applySpinApps(kubernetes, apps);
+  let timeToReady = applySpinApps(kubernetes, apps);
   let totalAppsDeployed = deploy.getSpinApps(kubernetes, namespace).length;
   deployedApps.add(totalAppsDeployed);
   console.log(`Deployed ${totalAppsDeployed} apps`);
+  timeToDeployTenApps.add(timeToReady, { number_of_apps: totalAppsDeployed });
   let endpoints = [];
   // TODO: get the number of batches from the Options
   for (let i = 0; i < apps.length; i++) {
