@@ -4,8 +4,8 @@ set -euo pipefail
 source $(dirname $(realpath "$0"))/spin-kube.sh
 
 CLUSTER_NAME="test-cluster"
-SHIM_VERSION=${1:-v0.14.1}
-NODE_IP=${2:-""}
+SHIM_VERSION=${SHIM_VERSION:-v0.13.1}
+NODE_IP=${NODE_IP:-""}
 HOST_PORT=8081
 
 # List of binary names
