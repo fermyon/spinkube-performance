@@ -9,8 +9,49 @@ export class SpinApp {
     this.apiVersion = "core.spinoperator.dev/v1alpha1";
     this.kind = "SpinApp";
     this.metadata = { name };
-    this.spec = spec;
+    let resources = getResourcesIfConfigured();
+    if (resources != {}) {
+      this.spec = Object.assign(spec, resources);
+    } else {
+      this.spec = spec;
+    }
   }
+}
+
+function getResourcesIfConfigured() {
+  const cpuLimit = `${__ENV.SK_CPU_LIMIT}`;
+  const cpuRequest = `${__ENV.SK_CPU_REQUEST}`;
+  const memoryLimit = `${__ENV.SK_MEMORY_LIMIT}`;
+  const memoryRequest = `${__ENV.SK_MEMORY_REQUEST}`;
+  let resources = {};
+  if (
+    cpuLimit === "undefined" &&
+    cpuRequest === "undefined" &&
+    memoryLimit === "undefined" &&
+    memoryRequest === "undefined"
+  ) {
+    return resources;
+  }
+
+  if (cpuRequest !== "undefined" || memoryRequest !== "undefined") {
+    resources.requests = {};
+    if (cpuRequest !== "undefined") {
+      resources.requests = Object.assign(resources.requests, {cpu: cpuRequest});
+    }
+    if (memoryRequest !== "undefined") {
+      resources.requests = Object.assign(resources.requests, {memory: memoryRequest});
+    }
+  }
+  if (cpuLimit !== "undefined" || memoryLimit !== "undefined") {
+    resources.limits = {};
+    if (cpuLimit !== "undefined") {
+      resources.limits = Object.assign(resources.limits, {cpu: cpuLimit});
+    }
+    if (memoryLimit !== "undefined") {
+      resources.limits = Object.assign(resources.limits, {memory: memoryLimit});
+    }
+  }
+  return { resources };
 }
 
 export function serviceEndpointForApp(appName, namespace, route) {
