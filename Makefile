@@ -18,52 +18,48 @@ build-and-push-apps:
 	./apps/build-and-push.sh $(REGISTRY_URL)
 
 run-density-test-%:
-	TEST=density \
-	SK_TEST_RUN_NAME=density-$* \
-	SK_SPIN_APP_ROUTE="" \
-	SK_SPIN_VERSION="$(SPIN_V_VERSION)" \
-	SK_OCI_TAG="perf" \
-	SK_OCI_REPO=$(REGISTRY_URL) \
-	./tests/run.sh $(REGISTRY_URL)
-	echo "Logs from Density Test $*"
-	kubectl logs job/density-$*-1
+	bash -c "trap '(echo Logs from Density Test $* && kubectl logs job/density-$*-1)' EXIT; \
+		TEST=density \
+		SK_TEST_RUN_NAME=density-$* \
+		SK_SPIN_APP_ROUTE="" \
+		SK_SPIN_VERSION="$(SPIN_V_VERSION)" \
+		SK_OCI_TAG="perf" \
+		SK_OCI_REPO=$(REGISTRY_URL) \
+		./tests/run.sh $(REGISTRY_URL)"
 
 run-density-tests: run-density-test-1 run-density-test-2 run-density-test-3 run-density-test-4 run-density-test-5
 	kubectl delete spinapp --all
 
 run-hello-world-test:
-	TEST=hello-world \
-	SK_SPIN_APP_ROUTE="hello" \
-	SK_OCI_TAG=$(SPIN_V_VERSION) \
-	SK_OCI_REPO=$(REGISTRY_URL) \
-	SK_REPLICAS=1 \
-	./tests/run.sh $(REGISTRY_URL)
-	echo "Logs from Hello World Test"
-	kubectl logs job/hello-world-1
+	bash -c "trap '(echo Logs from Hello World Test && kubectl logs job/hello-world-1)' EXIT; \
+		TEST=hello-world \
+		SK_SPIN_APP_ROUTE="hello" \
+		SK_OCI_TAG=$(SPIN_V_VERSION) \
+		SK_OCI_REPO=$(REGISTRY_URL) \
+		SK_REPLICAS=1 \
+		./tests/run.sh $(REGISTRY_URL)"
 
 run-ramping-vus-test-%:
-	TEST=ramping-vus \
-	SK_TEST_RUN_NAME=ramping-vus-$* \
-	SK_SPIN_APP_ROUTE="hello" \
-	SK_OCI_TAG=$(SPIN_V_VERSION) \
-	SK_OCI_REPO=$(REGISTRY_URL) \
-	SK_REPLICAS=$* \
-	./tests/run.sh $(REGISTRY_URL)
-	echo "Logs from Ramp Test"
-	kubectl logs job/ramping-vus-$*-1
+	bash -c "trap '(echo Logs from Ramp Test && kubectl logs job/ramping-vus-$*-1)' EXIT; \
+		TEST=ramping-vus \
+		SK_TEST_RUN_NAME=ramping-vus-$* \
+		SK_SPIN_APP_ROUTE="hello" \
+		SK_OCI_TAG=$(SPIN_V_VERSION) \
+		SK_OCI_REPO=$(REGISTRY_URL) \
+		SK_REPLICAS=$* \
+		./tests/run.sh $(REGISTRY_URL)"
 
 run-constant-vus-test-%:
 	# SET `K6_VUS` ENV VAR TO OVERRIDE DEFAULT VUS
-	TEST=constant-vus \
-	SK_TEST_RUN_NAME=constant-vus-$* \
-	SK_SPIN_APP_ROUTE="hello" \
-	SK_SPIN_APP="hello-world-rust" \
-	SK_OCI_TAG=$(SPIN_V_VERSION) \
-	SK_OCI_REPO=$(REGISTRY_URL) \
-	SK_REPLICAS=$* \
-	./tests/run.sh $(REGISTRY_URL)
-	echo "Logs from Constant VUs Test"
-	kubectl logs job/constant-vus-$*-1
+	bash -c "trap '(echo Logs from Constant VUs Test && kubectl logs job/constant-vus-$*-1)' EXIT; \
+		TEST=constant-vus \
+		SK_TEST_RUN_NAME=constant-vus-$* \
+		SK_SPIN_APP_ROUTE="hello" \
+		SK_SPIN_APP="hello-world-rust" \
+		SK_OCI_TAG=$(SPIN_V_VERSION) \
+		SK_OCI_REPO=$(REGISTRY_URL) \
+		SK_REPLICAS=$* \
+		./tests/run.sh $(REGISTRY_URL)"
 
 run-tests: run-hello-world-test run-constant-vus-test-1 run-ramping-vus-test-1 run-ramping-vus-test-10 run-density-tests
 
