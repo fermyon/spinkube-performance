@@ -78,7 +78,7 @@ install_kwasm_operator() {
 
   # Provision Nodes labeled with 'runtime=containerd-shim-spin'
   # Other nodes may have different labels/purposes and we may not want apps to run there
-  kubectl annotate node -l runtime=containerd-shim-spin kwasm.sh/kwasm-node=true
+  kubectl annotate node -l runtime=containerd-shim-spin kwasm.sh/kwasm-node=true shim_version="${SHIM_VERSION}"
 }
 
 install_k6_operator() {

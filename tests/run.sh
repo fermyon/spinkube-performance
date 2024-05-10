@@ -97,6 +97,7 @@ export_node_info
 export TAG_NODE_OS=$NODE_OS
 export TAG_NODE_ARCH=$NODE_ARCH
 export TAG_NODE_INSTANCE_TYPE=$NODE_INSTANCE_TYPE
+export TAG_EXECUTOR_VERSION="${SK_EXECUTOR}-${NODE_SHIM_VERSION}"
 
 # Create the script ConfigMap
 kubectl get configmap $test_run_name >/dev/null 2>&1 || \
