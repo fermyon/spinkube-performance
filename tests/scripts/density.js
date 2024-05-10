@@ -11,7 +11,7 @@ const replicas = `${__ENV.SK_REPLICAS}` != "undefined" ? parseInt(`${__ENV.SK_RE
 const namespace = `${__ENV.SK_NAMESPACE}` != "undefined" ? `${__ENV.SK_NAMESPACE}` : "default";
 const executor = `${__ENV.SK_EXECUTOR}` != "undefined" ? `${__ENV.SK_EXECUTOR}` : "containerd-shim-spin";
 const repo = `${__ENV.SK_OCI_REPO}` != "undefined" ? `${__ENV.SK_OCI_REPO}` : "spinkubeperf.azurecr.io";
-const tag = `${__ENV.SK_OCI_TAG}` != "undefined" ? `${__ENV.SK_OCI_TAG}` : "latest";
+const tag = `${__ENV.SK_OCI_TAG}` != "undefined" ? `${__ENV.SK_OCI_TAG}` : "perf";
 const route = `${__ENV.SK_SPIN_APP_ROUTE}` != "undefined" ? `${__ENV.SK_SPIN_APP_ROUTE}` : "";
 const maxScenarioDurationSecs = `${__ENV.SK_MAX_SCENARIO_DURATION_SECS}` != "undefined" ? `${__ENV.SK_MAX_SCENARIO_DURATION_SECS}` : 180;
 const restIntervalSecs = `${__ENV.SK_REST_INTERVAL_SECONDS}` != "undefined" ? `${__ENV.SK_REST_INTERVAL_SECONDS}` : 10;
@@ -90,7 +90,7 @@ export function setup() {
   let allApps = deploy.getSpinApps(kubernetes, namespace).length;
   let startQuantity = allApps == 0 ? 0 : allApps;
   console.log(`Deploying ${batchSize} apps to cluster with ${startQuantity} already deployed`);
-  let apps = createSpinApps(repo, startQuantity, batchSize);
+  let apps = createSpinApps(`${repo}/density-rust-`, startQuantity, batchSize);
   applySpinApps(kubernetes, apps);
   let totalAppsDeployed = deploy.getSpinApps(kubernetes, namespace).length;
   deployedApps.add(totalAppsDeployed);
