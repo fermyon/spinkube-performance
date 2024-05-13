@@ -51,3 +51,4 @@ url="${url}&view=spans&from_ts=$TEST_START_UTC&to_ts=$TEST_END_UTC&live=$live"
 
 echo "URL is:"
 echo $url
+export DATADOG_DASHBOARD_URL="${url}"
