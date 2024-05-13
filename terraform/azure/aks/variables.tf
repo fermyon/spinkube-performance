@@ -26,7 +26,7 @@ variable "system_nodepool" {
   })
   default = {
     name = "agentpool"
-    size = "Standard_A2_v2"
+    size = "Standard_D2s_v5"
     min  = 1
     max  = 1
   }
@@ -43,7 +43,7 @@ variable "user_nodepools" {
   }))
   default = [{
     name       = "apps"
-    size       = "Standard_A2_v2"
+    size       = "Standard_D2s_v5"
     node_count = 1
     max_pods   = 250
     labels = {
@@ -53,7 +53,7 @@ variable "user_nodepools" {
     },
     {
       name       = "system"
-      size       = "Standard_A2_v2"
+      size       = "Standard_D2s_v5"
       node_count = 1
       max_pods   = 100
       labels = {
