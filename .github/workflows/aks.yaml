@@ -7,7 +7,7 @@ on:
       apps_nodepool_sku:
         type: string
         description: "SKU for the node(s) running SpinApps"
-        default: 'Standard_A2_v2'
+        default: 'Standard_D2s_v5'
       datadog_dashboard_id:
         type: string
         description: 'ID of datadog dashboard'
