@@ -23,7 +23,7 @@ export let options = {
     http_req_failed: ['rate<0.1'],
   },
   setupTimeout: '300s',
-  noConnectionReuse: false,
+  noConnectionReuse: true,
   discardResponseBodies: true,
   // executor: 'constant-vus', // this is the default executor and implied
   vus: 20,
