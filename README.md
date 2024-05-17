@@ -1,15 +1,15 @@
 # SpinKube Performance Test Suite
 
-> WARNING: THIS IS A VERY IN PROGRESS POC
+> WARNING: THIS IS AN IN PROGRESS POC
 
-The suite consists of multiple sections:
+The suite consists of the following components:
 
-1. Spin apps
-2. JS K6 test scripts
-3. Test configuration files (`test-config.json`)
-4. Test options files (`options.json`)
-5. Environment/cluster set up scripts
-6. Datadog dashboard
+1. [Spin apps](./apps/)
+2. [JS K6 test scripts](./tests/scripts/)
+3. A [script](tests/run.sh) to inject tags and environment variables into K6 Operator `TestRun`s
+4. [Terraform modules](./terraform/)
+5. SpinKube setup [scripts](./environment/)
+6. [Datadog dashboard](./dashboard/)
 
 This guide will help you run the K6 scripts for testing SpinKube deployments.
 
