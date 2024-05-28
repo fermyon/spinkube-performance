@@ -12,6 +12,10 @@ on:
         type: string
         description: 'ID of datadog dashboard'
         default: 'x5w-93r-msb'
+      containerd_shim_spin_version:
+        type: string
+        description: 'Version of containerd-shim-spin to install'
+        default: 'v0.14.1'
 
 env:
   REGISTRY_URL: spinkubeperf.azurecr.io
@@ -57,6 +61,7 @@ jobs:
         env:
           DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
           READINESS_TIMEOUT: "120s"
+          SHIM_VERSION: ${{ github.event.inputs.containerd_shim_spin_version }}
         run: ./environment/spin-kube-k8s.sh
 
       - name: Run tests
