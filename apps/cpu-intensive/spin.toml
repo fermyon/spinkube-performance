@@ -1,0 +1,21 @@
+spin_manifest_version = 2
+
+[application]
+name = "cpu-intensive"
+version = "0.1.0"
+authors = [
+  "Caleb Schoepp <caleb.schoepp@fermyon.com>",
+  "Vaughn Dice <vaughn.dice@fermyon.com>"
+]
+description = "A CPU-intensive Spin app that computes Fibonacci sequences"
+
+[[trigger.http]]
+route = "/..."
+component = "fibonacci"
+
+[component.fibonacci]
+source = "main.wasm"
+allowed_outbound_hosts = []
+[component.fibonacci.build]
+command = "tinygo build -target=wasi -gc=leaking -no-debug -o main.wasm main.go"
+watch = ["**/*.go", "go.mod"]
