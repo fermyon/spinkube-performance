@@ -1,0 +1,18 @@
+spin_manifest_version = 2
+
+[application]
+name = "mem-intensive"
+version = "0.1.0"
+authors = [ "Vaughn Dice <vaughn.dice@fermyon.com>" ]
+description = "A memory-intensive Spin app that counts the number of 'bacon's from N number of baconipsum paragraphs"
+
+[[trigger.http]]
+route = "/..."
+component = "bacon-counter"
+
+[component.bacon-counter]
+source = "main.wasm"
+allowed_outbound_hosts = ["https://baconipsum.com"]
+[component.bacon-counter.build]
+command = "tinygo build -target=wasi -gc=leaking -no-debug -o main.wasm main.go"
+watch = ["**/*.go", "go.mod"]
