@@ -11,7 +11,7 @@ route = "/..."
 component = "password-hasher"
 
 [component.password-hasher]
-source = "target/wasm32-wasi/release/cpu_mem_sleep.wasm"
+source = "target/wasm32-wasi/release/password_hasher.wasm"
 allowed_outbound_hosts = []
 [component.password-hasher.build]
 command = "cargo build --target wasm32-wasi --release"
