@@ -39,6 +39,17 @@ run-hello-world-test:
 		SK_REPLICAS=1 \
 		./tests/run.sh $(REGISTRY_URL)"
 
+run-password-hasher-test:
+	bash -c "trap '(echo Logs from Password Hasher Test && kubectl logs job/password-hasher-1)' EXIT; \
+		TEST=password-hasher \
+		SK_OCI_TAG=$(SPIN_V_VERSION) \
+		SK_OCI_REPO=$(REGISTRY_URL) \
+		SK_REPLICAS=1 \
+		SK_HASH_MEMORY=1024 \
+		SK_HASH_CPU=1 \
+		SK_HASH_SLEEP=1000 \
+		./tests/run.sh $(REGISTRY_URL)"
+
 run-ramping-vus-test-%:
 	bash -c "trap '(echo Logs from Ramp Test && kubectl logs job/ramping-vus-$*-1)' EXIT; \
 		TEST=ramping-vus \
