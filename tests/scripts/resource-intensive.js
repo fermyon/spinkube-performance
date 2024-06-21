@@ -1,13 +1,15 @@
 import http from 'k6/http';
+import { check } from 'k6';
 import exec from 'k6/execution';
 import { Kubernetes } from 'k6/x/kubernetes';
 import * as deploy from "./common/common.js";
 import { sleep } from 'k6';
+
 const testScriptName = "resource-intensive";
 const replicas = `${__ENV.SK_REPLICAS}` != "undefined" ? parseInt(`${__ENV.SK_REPLICAS}`) : 1; 
 const namespace = `${__ENV.SK_NAMESPACE}` != "undefined" ? `${__ENV.SK_NAMESPACE}` : "default";
 const executor = `${__ENV.SK_EXECUTOR}` != "undefined" ? `${__ENV.SK_EXECUTOR}` : "containerd-shim-spin";
-const repo = `${__ENV.SK_OCI_REPO}` != "undefined" ? `${__ENV.SK_OCI_REPO}` : "ghcr.io/kate-goldenring/performance";
+const repo = `${__ENV.SK_OCI_REPO}` != "undefined" ? `${__ENV.SK_OCI_REPO}` : "spinkubeperf.azurecr.io";
 const tag = `${__ENV.SK_OCI_TAG}` != "undefined" ? `${__ENV.SK_OCI_TAG}` : "latest";
 const route = `${__ENV.SK_SPIN_APP_ROUTE}` != "undefined" ? `${__ENV.SK_SPIN_APP_ROUTE}` : "";
 const delay = `${__ENV.SK_DELAY}` != "undefined" ? `${__ENV.SK_DELAY}` : 0.01;
@@ -16,9 +18,9 @@ const name = `${__ENV.SK_TEST_RUN_NAME}` != "undefined" ? `${__ENV.SK_TEST_RUN_N
 const testDuration='30s';
 
 // App specific envs
-const memory = `${__ENV.SK_HASH_MEMORY}` != "undefined" ? `${__ENV.SK_HASH_MEMORY}` : "100";
-const cpu = `${__ENV.SK_HASH_CPU}` != "undefined" ? `${__ENV.SK_HASH_CPU}` : "50";
-const sleepFor = `${__ENV.SK_HASH_SLEEP}` != "undefined" ? `${__ENV.SK_HASH_SLEEP}` : "1000";
+const memoryKib = `${__ENV.SK_HASH_MEMORY_KIB}` != "undefined" ? `${__ENV.SK_HASH_MEMORY_KIB}` : "10000";
+const cpuIter = `${__ENV.SK_HASH_CPU_ITER}` != "undefined" ? `${__ENV.SK_HASH_CPU_ITER}` : "50";
+const sleepMs = `${__ENV.SK_HASH_SLEEP_MS}` != "undefined" ? `${__ENV.SK_HASH_SLEEP_MS}` : "1000";
 
 export let options = {
   tags: {
@@ -66,12 +68,16 @@ export function setup() {
  * @param {string} data - The URL to send the request to.
  */
 export default function () {
-  let testCase = exec.scenario.name;
-  let name = `${testScriptName}-${testCase}`;
   let endpoint = deploy.serviceEndpointForApp(name, namespace, route);
-  http.get(`${endpoint}?mem=${memory}`, { tags: {memory: memory} });
-  http.get(`${endpoint}?cpu=${cpu}`, { tags: {cpu: cpu} });
-  http.get(`${endpoint}?sleep=${sleepFor}`, { tags: {sleep: sleepFor} });
+
+  let res = http.get(`${endpoint}?mem=${memoryKib}`, { tags: {memoryKib: memoryKib} });
+  check(res, { "response code was 200": (res) => res.status == 200 }, { memoryKib: memoryKib });
+  sleep(delay);
+  res = http.get(`${endpoint}?cpuIter=${cpuIter}`, { tags: {cpuIter: cpuIter} });
+  check(res, { "response code was 200": (res) => res.status == 200 }, { cpuIter: cpuIter });
+  sleep(delay);
+  res = http.get(`${endpoint}?sleep=${sleepMs}`, { tags: {sleep: sleepMs} });
+  check(res, { "response code was 200": (res) => res.status == 200 }, { sleepMs: sleepMs });
   sleep(delay);
 }
 
