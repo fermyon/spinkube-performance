@@ -49,11 +49,9 @@ export function setup() {
   let image = deploy.imageForApp(repo, tag, appToTest);
   deploy.applySpinApp(kubernetes, name, image, replicas, executor, namespace);
   const timeout = 60;
-  if (`${__ENV.SK_SKIP_WAIT_READY}` == "undefined" ) {
-    if (deploy.waitAllAppsReady(kubernetes, timeout, namespace, replicas) === -1) {
-      console.error(`SpinApps not ready after ${timeout} seconds`);
-      exec.test.abort(`SpinApps not ready after ${timeout} seconds`);
-    }
+  if (deploy.waitAllAppsReady(kubernetes, timeout, namespace, replicas) === -1) {
+    console.error(`SpinApps not ready after ${timeout} seconds`);
+    exec.test.abort(`SpinApps not ready after ${timeout} seconds`);
   }
   sleep(20);
 
