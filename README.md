@@ -18,6 +18,9 @@ This guide will help you run the K6 scripts for testing SpinKube deployments.
 Several scripts are provided in the [`environment` directory](./environment/) to help set up your Kubernetes environment. 
 After executing, ensure you have access to the cluster by storing the cluster config at `$HOME/.kube/config`.
 
+If you are using [KinD](https://kind.sigs.k8s.io/), create the cluster with the [kind-config.yml](./environment/kind-config.yml) config,
+which applies the necessary node labels at startup: `kind cluster create --config environment/kind-config.yml`
+
 ### Accessing a Remote Cluster
 
 A remote cluster can be accessed by pointing a Kubernetes client to a cluster config (kubeconfig file).
