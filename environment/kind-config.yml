@@ -5,6 +5,8 @@ nodes:
 - role: worker
   labels:
     workload: system
+    node.kubernetes.io/instance-type: kind
 - role: worker
   labels:
     runtime: containerd-shim-spin
+    node.kubernetes.io/instance-type: kind
