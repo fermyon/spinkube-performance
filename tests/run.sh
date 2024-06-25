@@ -34,7 +34,7 @@ wait_for_testrun() {
 inject_envs_with_prefix() {
     local prefix=$1
     local file=$2
-    env | grep "^$prefix" | while IFS= read -r line; do
+    env | { grep "^$prefix" || true; } | while IFS= read -r line; do
         IFS="=" read -r name value <<< "$line"
         export name
         export value
