@@ -15,7 +15,7 @@ on:
       containerd_shim_spin_version:
         type: string
         description: 'Version of containerd-shim-spin to install'
-        default: 'v0.14.1'
+        default: 'v0.15.0'
 
 env:
   REGISTRY_URL: spinkubeperf.azurecr.io
