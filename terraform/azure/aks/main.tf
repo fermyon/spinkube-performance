@@ -34,8 +34,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   dns_prefix = local.base_name
   network_profile {
-    network_plugin    = "azure"
-    network_policy    = "azure"
+    network_plugin    = "kubenet"
     load_balancer_sku = "standard"
   }
 
