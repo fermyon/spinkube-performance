@@ -15,11 +15,11 @@ on:
       containerd_shim_spin_version:
         type: string
         description: 'Version of containerd-shim-spin to install'
-        default: 'v0.15.0'
+        default: 'v0.15.1'
 
 env:
   REGISTRY_URL: spinkubeperf.azurecr.io
-  SPIN_V_VERSION: "2.5.0"
+  SPIN_V_VERSION: "2.6.0"
   # Terraform env vars associated with configuration variables
   TF_VAR_prefix: ci-spinkube-perf
   TF_VAR_apps_nodepool_sku: ${{ github.event.inputs.apps_nodepool_sku }}
