@@ -9,7 +9,7 @@ on:
 
 env:
     REGISTRY_URL: spinkubeperf.azurecr.io
-    SPIN_V_VERSION: "2.5.0"
+    SPIN_V_VERSION: "2.6.0"
     
 jobs:
   apps:
