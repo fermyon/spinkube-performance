@@ -72,7 +72,7 @@ run-constant-vus-test-%:
 		SK_REPLICAS=$* \
 		./tests/run.sh $(REGISTRY_URL)"
 
-run-tests: run-hello-world-test run-constant-vus-test-1 run-ramping-vus-test-1 run-ramping-vus-test-10 run-density-tests
+run-tests: run-hello-world-test run-constant-vus-test-1 run-ramping-vus-test-1 run-ramping-vus-test-10 run-resource-intensive-test run-density-tests
 
 cleanup: cleanup-apps cleanup-tests cleanup-configmaps
 
