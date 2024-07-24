@@ -47,7 +47,7 @@ run-resource-intensive-test:
 		SK_REPLICAS=1 \
 		SK_HASH_MEMORY=10000 \
 		SK_HASH_CPU=50 \
-		SK_HASH_SLEEP=1000 \
+		SK_HASH_SLEEP_MS=1000 \
 		./tests/run.sh $(REGISTRY_URL)"
 
 run-ramping-vus-test-%:
