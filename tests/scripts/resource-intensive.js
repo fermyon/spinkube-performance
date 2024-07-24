@@ -68,14 +68,14 @@ export function setup() {
 export default function () {
   let endpoint = deploy.serviceEndpointForApp(name, namespace, route);
 
-  let res = http.get(`${endpoint}?mem=${memoryKib}`, { tags: {memoryKib: memoryKib} });
-  check(res, { "response code was 200": (res) => res.status == 200 }, { memoryKib: memoryKib });
+  let res = http.get(`${endpoint}?mem=${memoryKib}`, { tags: {memory_kib: memoryKib} });
+  check(res, { "response code was 200": (res) => res.status == 200 }, { memory_kib: memoryKib });
   sleep(delay);
-  res = http.get(`${endpoint}?cpuIter=${cpuIter}`, { tags: {cpuIter: cpuIter} });
-  check(res, { "response code was 200": (res) => res.status == 200 }, { cpuIter: cpuIter });
+  res = http.get(`${endpoint}?cpuIter=${cpuIter}`, { tags: {cpu_iter: cpuIter} });
+  check(res, { "response code was 200": (res) => res.status == 200 }, { cpu_iter: cpuIter });
   sleep(delay);
   res = http.get(`${endpoint}?sleep=${sleepMs}`, { tags: {sleep: sleepMs} });
-  check(res, { "response code was 200": (res) => res.status == 200 }, { sleepMs: sleepMs });
+  check(res, { "response code was 200": (res) => res.status == 200 }, { sleep_ms: sleepMs });
   sleep(delay);
 }
 
