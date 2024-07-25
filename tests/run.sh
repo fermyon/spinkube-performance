@@ -59,6 +59,7 @@ inject_tags() {
     done
 }
 
+KUBE_PROMETHEUS_CHART_NAME=${KUBE_PROMETHEUS_CHART_NAME:-"prometheus"}
 PREFIX_K6_ENVS="K6"
 PREFIX_TEST_ENVS="SK"
 PREFIX_TEST_TAGS="TAG_"
@@ -117,7 +118,8 @@ yq -i '(.spec.runner.image = env(runner_image)) |
 if [ "$OUTPUT" == "prometheus" ];
 then
     echo "Running with Prometheus output"
-    export K6_PROMETHEUS_RW_SERVER_URL="http://localhost:9090/api/v1/write"
+    export K6_OUT="experimental-prometheus-rw"
+    export K6_PROMETHEUS_RW_SERVER_URL="http://${KUBE_PROMETHEUS_CHART_NAME}-kube-prometheus-prometheus:9090/api/v1/write"
     export K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM="true"
     export K6_PROMETHEUS_RW_TREND_STATS="p(99),p(50),min,max,avg"
 elif [ "$OUTPUT" == "datadog" ];

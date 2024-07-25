@@ -32,6 +32,28 @@ install_cert_manager() {
   kubectl wait --for=condition=available --timeout=${READINESS_TIMEOUT} deployment/cert-manager-webhook -n cert-manager
 }
 
+install_kube_prometheus() {
+  # Install the kube-prometheus-stack: https://github.com/prometheus-operator/kube-prometheus
+  # Installs the Prometheus operator, node exporters, and Grafana
+  # Enable Prometheus remote-write receiver and native histograms to ensure k6 metrics can be received
+  # See more Helm chart values here: https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+  #
+  # Note: the chart name "prometheus" will become the prefix for all Pod names
+  #
+  # Note: we set the nodeSelector for all components to run on the system nodes EXCEPT
+  # the agents, as we of course need an agent present on the apps node to capture data
+  # and forward on to Grafana
+  helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
+    --set prometheus.prometheusSpec.enableRemoteWriteReceiver=true \
+    --set 'prometheus.prometheusSpec.enableFeatures[0]="native-histograms"' \
+    --set prometheus.prometheusSpec.nodeSelector.workload=system \
+    --set prometheusOperator.nodeSelector.workload=system \
+    --set grafana.nodeSelector.workload=system \
+    --set kube-state-metrics.nodeSelector.workload=system \
+    --set alertmanager.alertmanagerSpec.nodeSelector.workload=system \
+    --set prometheus.prometheusSpec.scrapeInterval=5s
+}
+
 install_datadog() {
   if [[ -z "${DATADOG_API_KEY}" ]]; then
     echo "WARNING: DATADOG_API_KEY is empty; skipping datadog installation"
