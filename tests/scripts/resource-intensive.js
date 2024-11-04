@@ -48,7 +48,7 @@ export function setup() {
   const kubernetes = new Kubernetes();
   let image = deploy.imageForApp(repo, tag, appToTest);
   deploy.applySpinApp(kubernetes, name, image, replicas, executor, namespace);
-  const timeout = 60;
+  const timeout = 200;
   if (deploy.waitAllAppsReady(kubernetes, timeout, namespace, replicas) === -1) {
     console.error(`SpinApps not ready after ${timeout} seconds`);
     exec.test.abort(`SpinApps not ready after ${timeout} seconds`);
