@@ -18,7 +18,7 @@ build-and-push-apps:
 	./apps/build-and-push.sh $(REGISTRY_URL)
 
 run-density-test-%:
-	bash -c "trap '(echo Logs from Density Test $* && kubectl logs job/density-$*-1)' EXIT; \
+	bash -c "trap '(echo Logs from Density Test $* && kubectl logs job/density-$*-1 && kubectl describe pod)' EXIT; \
 		TEST=density \
 		SK_TEST_RUN_NAME=density-$* \
 		SK_SPIN_APP_ROUTE="" \
@@ -31,7 +31,7 @@ run-density-tests: run-density-test-1 run-density-test-2 run-density-test-3 run-
 	kubectl delete spinapp --all
 
 run-hello-world-test:
-	bash -c "trap '(echo Logs from Hello World Test && kubectl logs job/hello-world-1)' EXIT; \
+	bash -c "trap '(echo Logs from Hello World Test && kubectl logs job/hello-world-1 && kubectl describe pod)' EXIT; \
 		TEST=hello-world \
 		SK_SPIN_APP_ROUTE="hello" \
 		SK_OCI_TAG=$(SPIN_V_VERSION) \
@@ -40,7 +40,7 @@ run-hello-world-test:
 		./tests/run.sh $(REGISTRY_URL)"
 
 run-resource-intensive-test:
-	bash -c "trap '(echo Logs from Resource Intensive Test && kubectl logs job/resource-intensive-1)' EXIT; \
+	bash -c "trap '(echo Logs from Resource Intensive Test && kubectl logs job/resource-intensive-1 && kubectl describe pod)' EXIT; \
 		TEST=resource-intensive \
 		SK_OCI_TAG=$(SPIN_V_VERSION) \
 		SK_OCI_REPO=$(REGISTRY_URL) \
@@ -51,7 +51,7 @@ run-resource-intensive-test:
 		./tests/run.sh $(REGISTRY_URL)"
 
 run-ramping-vus-test-%:
-	bash -c "trap '(echo Logs from Ramp Test && kubectl logs job/ramping-vus-$*-1)' EXIT; \
+	bash -c "trap '(echo Logs from Ramp Test && kubectl logs job/ramping-vus-$*-1 && kubectl describe pod)' EXIT; \
 		TEST=ramping-vus \
 		SK_TEST_RUN_NAME=ramping-vus-$* \
 		SK_SPIN_APP_ROUTE="hello" \
@@ -62,7 +62,7 @@ run-ramping-vus-test-%:
 
 run-constant-vus-test-%:
 	# SET `K6_VUS` ENV VAR TO OVERRIDE DEFAULT VUS
-	bash -c "trap '(echo Logs from Constant VUs Test && kubectl logs job/constant-vus-$*-1)' EXIT; \
+	bash -c "trap '(echo Logs from Constant VUs Test && kubectl logs job/constant-vus-$*-1 && kubectl describe pod)' EXIT; \
 		TEST=constant-vus \
 		SK_TEST_RUN_NAME=constant-vus-$* \
 		SK_SPIN_APP_ROUTE="hello" \
