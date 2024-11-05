@@ -88,7 +88,8 @@ export function applySpinApp(kubernetes, name, image, replicas, executor, namesp
 }
 
 export function waitAllAppsReady(kubernetes, duration_sec, namespace, replicas) {
-  let now = new Date().getTime();
+  let start = new Date().getTime();
+  let now = start;
   let end = now + (duration_sec * 1000);
   while (now < end) {
     let spinApps = getSpinApps(kubernetes, namespace);
@@ -104,7 +105,7 @@ export function waitAllAppsReady(kubernetes, duration_sec, namespace, replicas) 
       }
       if (ready == spinApps.length) {
         console.log(`All apps are ready`);
-        return end - now;
+        return now - start;
       }
     }
     now = new Date().getTime();
