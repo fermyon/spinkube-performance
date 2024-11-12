@@ -108,6 +108,6 @@ export function teardown() {
   const kubernetes = new Kubernetes();
   for (const testCase of cases) {
     let name = `${testScriptName}-${testCase}`;
-    kubernetes.delete("SpinApp.core.spinoperator.dev", name, namespace);
+    kubernetes.delete("SpinApp.core.spinkube.dev", name, namespace);
   }
 }

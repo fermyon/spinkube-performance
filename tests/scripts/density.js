@@ -139,6 +139,6 @@ export function teardown() {
   console.log("Skipping teardown for density test");
   // const kubernetes = new Kubernetes();
   // for (let i = 0; i < endpoints.length; i++) {
-  //   kubernetes.delete("SpinApp.core.spinoperator.dev", endpoints[i].name, namespace);
+  //   kubernetes.delete("SpinApp.core.spinkube.dev", endpoints[i].name, namespace);
   // }
 }
