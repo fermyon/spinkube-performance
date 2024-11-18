@@ -934,7 +934,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "{executor_version=\"containerd-shim-spin-v0.15.1\", expected_response=\"true\", instance_id=\"1\", job_name=\"constant-vus-1-1\", method=\"GET\", name=\"http://constant-vus-1.default.svc.cluster.local/hello\", node_arch=\"amd64\", node_instance_type=\"Standard_D2s_v5\", node_os=\"linux\", proto=\"HTTP/1.1\", replicas=\"1\", scenario=\"default\", spin_version=\"2.6.0\", status=\"200\", test_id=\"2024-07-25-09:50:55\", test_name=\"constant-vus\", url=\"http://constant-vus-1.default.svc.cluster.local/hello\"}"
+                  "{executor_version=\"containerd-shim-spin-v0.17.0\", expected_response=\"true\", instance_id=\"1\", job_name=\"constant-vus-1-1\", method=\"GET\", name=\"http://constant-vus-1.default.svc.cluster.local/hello\", node_arch=\"amd64\", node_instance_type=\"Standard_D2s_v5\", node_os=\"linux\", proto=\"HTTP/1.1\", replicas=\"1\", scenario=\"default\", spin_version=\"3.0.0\", status=\"200\", test_id=\"2024-07-25-09:50:55\", test_name=\"constant-vus\", url=\"http://constant-vus-1.default.svc.cluster.local/hello\"}"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -1026,7 +1026,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "{executor_version=\"containerd-shim-spin-v0.15.1\", expected_response=\"true\", instance_id=\"1\", job_name=\"constant-vus-1-1\", method=\"GET\", name=\"http://constant-vus-1.default.svc.cluster.local/hello\", node_arch=\"amd64\", node_instance_type=\"Standard_D2s_v5\", node_os=\"linux\", proto=\"HTTP/1.1\", replicas=\"1\", scenario=\"default\", spin_version=\"2.6.0\", status=\"200\", test_id=\"2024-07-24-11:45:10\", test_name=\"constant-vus\", url=\"http://constant-vus-1.default.svc.cluster.local/hello\"}"
+                  "{executor_version=\"containerd-shim-spin-v0.17.0\", expected_response=\"true\", instance_id=\"1\", job_name=\"constant-vus-1-1\", method=\"GET\", name=\"http://constant-vus-1.default.svc.cluster.local/hello\", node_arch=\"amd64\", node_instance_type=\"Standard_D2s_v5\", node_os=\"linux\", proto=\"HTTP/1.1\", replicas=\"1\", scenario=\"default\", spin_version=\"3.0.0\", status=\"200\", test_id=\"2024-07-24-11:45:10\", test_name=\"constant-vus\", url=\"http://constant-vus-1.default.svc.cluster.local/hello\"}"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -1114,7 +1114,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "{executor_version=\"containerd-shim-spin-v0.15.1\", expected_response=\"true\", instance_id=\"1\", job_name=\"constant-vus-1-1\", method=\"GET\", name=\"http://constant-vus-1.default.svc.cluster.local/hello\", node_arch=\"amd64\", node_instance_type=\"Standard_D2s_v5\", node_os=\"linux\", proto=\"HTTP/1.1\", replicas=\"1\", scenario=\"default\", spin_version=\"2.6.0\", status=\"200\", test_id=\"2024-07-24-11:45:10\", test_name=\"constant-vus\", url=\"http://constant-vus-1.default.svc.cluster.local/hello\"}"
+                  "{executor_version=\"containerd-shim-spin-v0.17.0\", expected_response=\"true\", instance_id=\"1\", job_name=\"constant-vus-1-1\", method=\"GET\", name=\"http://constant-vus-1.default.svc.cluster.local/hello\", node_arch=\"amd64\", node_instance_type=\"Standard_D2s_v5\", node_os=\"linux\", proto=\"HTTP/1.1\", replicas=\"1\", scenario=\"default\", spin_version=\"3.0.0\", status=\"200\", test_id=\"2024-07-24-11:45:10\", test_name=\"constant-vus\", url=\"http://constant-vus-1.default.svc.cluster.local/hello\"}"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -1201,7 +1201,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "{executor_version=\"containerd-shim-spin-v0.15.1\", expected_response=\"true\", instance_id=\"1\", job_name=\"constant-vus-1-1\", method=\"GET\", name=\"http://constant-vus-1.default.svc.cluster.local/hello\", node_arch=\"amd64\", node_instance_type=\"Standard_D2s_v5\", node_os=\"linux\", proto=\"HTTP/1.1\", replicas=\"1\", scenario=\"default\", spin_version=\"2.6.0\", status=\"200\", test_id=\"2024-07-24-11:45:10\", test_name=\"constant-vus\", url=\"http://constant-vus-1.default.svc.cluster.local/hello\"}"
+                  "{executor_version=\"containerd-shim-spin-v0.17.0\", expected_response=\"true\", instance_id=\"1\", job_name=\"constant-vus-1-1\", method=\"GET\", name=\"http://constant-vus-1.default.svc.cluster.local/hello\", node_arch=\"amd64\", node_instance_type=\"Standard_D2s_v5\", node_os=\"linux\", proto=\"HTTP/1.1\", replicas=\"1\", scenario=\"default\", spin_version=\"3.0.0\", status=\"200\", test_id=\"2024-07-24-11:45:10\", test_name=\"constant-vus\", url=\"http://constant-vus-1.default.svc.cluster.local/hello\"}"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -1308,7 +1308,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "{executor_version=\"containerd-shim-spin-v0.15.1\", expected_response=\"true\", instance_id=\"1\", job_name=\"constant-vus-1-1\", method=\"GET\", name=\"http://constant-vus-1.default.svc.cluster.local/hello\", node_arch=\"amd64\", node_instance_type=\"Standard_D2s_v5\", node_os=\"linux\", proto=\"HTTP/1.1\", replicas=\"1\", scenario=\"default\", spin_version=\"2.6.0\", status=\"200\", test_id=\"2024-07-24-12:05:31\", test_name=\"constant-vus\", url=\"http://constant-vus-1.default.svc.cluster.local/hello\"}"
+                  "{executor_version=\"containerd-shim-spin-v0.17.0\", expected_response=\"true\", instance_id=\"1\", job_name=\"constant-vus-1-1\", method=\"GET\", name=\"http://constant-vus-1.default.svc.cluster.local/hello\", node_arch=\"amd64\", node_instance_type=\"Standard_D2s_v5\", node_os=\"linux\", proto=\"HTTP/1.1\", replicas=\"1\", scenario=\"default\", spin_version=\"3.0.0\", status=\"200\", test_id=\"2024-07-24-12:05:31\", test_name=\"constant-vus\", url=\"http://constant-vus-1.default.svc.cluster.local/hello\"}"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -1438,7 +1438,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "{executor_version=\"containerd-shim-spin-v0.15.1\", expected_response=\"true\", instance_id=\"1\", job_name=\"ramping-vus-1-1\", method=\"GET\", name=\"http://ramping-vus-1.default.svc.cluster.local/hello\", node_arch=\"amd64\", node_instance_type=\"Standard_D2s_v5\", node_os=\"linux\", proto=\"HTTP/1.1\", replicas=\"1\", scenario=\"ramp\", spin_version=\"2.6.0\", status=\"200\", test_id=\"2024-07-24-15:36:19\", test_name=\"ramping-vus\", url=\"http://ramping-vus-1.default.svc.cluster.local/hello\"}"
+                  "{executor_version=\"containerd-shim-spin-v0.17.0\", expected_response=\"true\", instance_id=\"1\", job_name=\"ramping-vus-1-1\", method=\"GET\", name=\"http://ramping-vus-1.default.svc.cluster.local/hello\", node_arch=\"amd64\", node_instance_type=\"Standard_D2s_v5\", node_os=\"linux\", proto=\"HTTP/1.1\", replicas=\"1\", scenario=\"ramp\", spin_version=\"3.0.0\", status=\"200\", test_id=\"2024-07-24-15:36:19\", test_name=\"ramping-vus\", url=\"http://ramping-vus-1.default.svc.cluster.local/hello\"}"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -1562,7 +1562,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "{__name__=\"k6_vus\", executor_version=\"containerd-shim-spin-v0.15.1\", instance_id=\"1\", job_name=\"ramping-vus-1-1\", node_arch=\"amd64\", node_instance_type=\"Standard_D2s_v5\", node_os=\"linux\", spin_version=\"2.6.0\", test_id=\"2024-07-24-15:36:19\", test_name=\"ramping-vus\"}"
+                  "{__name__=\"k6_vus\", executor_version=\"containerd-shim-spin-v0.17.0\", instance_id=\"1\", job_name=\"ramping-vus-1-1\", node_arch=\"amd64\", node_instance_type=\"Standard_D2s_v5\", node_os=\"linux\", spin_version=\"3.0.0\", test_id=\"2024-07-24-15:36:19\", test_name=\"ramping-vus\"}"
                 ],
                 "prefix": "All except:",
                 "readOnly": true

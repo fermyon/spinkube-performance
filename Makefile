@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 
 REGISTRY_URL ?= spinkubeperf.azurecr.io
-SPIN_V_VERSION ?= 2.6.0
+SPIN_V_VERSION ?= 3.0.0
 
 k6-build:
 	go install go.k6.io/xk6/cmd/xk6@latest

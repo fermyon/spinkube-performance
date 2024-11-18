@@ -81,5 +81,5 @@ export default function (endpoint) {
 export function teardown() {
   console.log("Tearing down test")
   const kubernetes = new Kubernetes();
-  kubernetes.delete("SpinApp.core.spinoperator.dev", name, namespace);
+  kubernetes.delete("SpinApp.core.spinkube.dev", name, namespace);
 }

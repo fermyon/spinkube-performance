@@ -6,7 +6,7 @@ import { sleep } from 'k6';
  */
 export class SpinApp {
   constructor(name, spec) {
-    this.apiVersion = "core.spinoperator.dev/v1alpha1";
+    this.apiVersion = "core.spinkube.dev/v1alpha1";
     this.kind = "SpinApp";
     this.metadata = { name };
     let resources = getResourcesIfConfigured();
@@ -64,7 +64,7 @@ export function imageForApp(repo, tag, appName) {
 }
 
 export function getSpinApps(kubernetes, namespace) {
-  return kubernetes.list("SpinApp.core.spinoperator.dev", namespace);
+  return kubernetes.list("SpinApp.core.spinkube.dev", namespace);
 }
 
 export function applySpinApp(kubernetes, name, image, replicas, executor, namespace) {
@@ -80,7 +80,7 @@ export function applySpinApp(kubernetes, name, image, replicas, executor, namesp
   try {
     kubernetes.create(spinApp);
   } catch (e) {
-    let exists = kubernetes.list("SpinApp.core.spinoperator.dev", namespace).filter((app) => app.metadata.name == spinApp.metadata.name);
+    let exists = kubernetes.list("SpinApp.core.spinkube.dev", namespace).filter((app) => app.metadata.name == spinApp.metadata.name);
     if (exists.length == 0) {
       throw e;
     }
